@@ -1,0 +1,21 @@
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  NETLIFY_NEXT_PLUGIN_SKIP = "true"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+# Handle image optimization redirects
+[[redirects]]
+  from = "/_next/image*"
+  to = "/_next/image/:splat"
+  status = 200
+
+# This ensures that 404 pages from the Next.js app are returned
+[[redirects]]
+  from = "/*"
+  to = "/404"
+  status = 404 

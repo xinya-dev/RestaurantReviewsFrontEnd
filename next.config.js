@@ -6,6 +6,7 @@ const nextConfig = {
     typedRoutes: true,
   },
   images: {
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: "https",
@@ -38,7 +39,16 @@ const nextConfig = {
         pathname: "/**",
       },
     ],
+    domains: [
+      "images.pexels.com",
+      "images.unsplash.com",
+      "a0.muscache.com",
+      "www.gstatic.com",
+      "flagcdn.com",
+      "restaurantreviewsfrontend.netlify.app"
+    ],
   },
+  output: 'standalone',
 };
 
 module.exports = nextConfig;
