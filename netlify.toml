@@ -1,6 +1,19 @@
 [build]
   command = "npm run build"
-  publish = ".next"
+  publish = "out"
+
+# Production context: all deploys from the Production branch set in your site's
+# deploy contexts will inherit these settings.
+[context.production]
+  command = "npm run build"
+  publish = "out"
+
+# For dynamic redirects and better support
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+  force = false
 
 [build.environment]
   NETLIFY_NEXT_PLUGIN_SKIP = "true"
@@ -12,10 +25,4 @@
 [[redirects]]
   from = "/_next/image*"
   to = "/_next/image/:splat"
-  status = 200
-
-# This ensures that 404 pages from the Next.js app are returned
-[[redirects]]
-  from = "/*"
-  to = "/404"
-  status = 404 
+  status = 200 

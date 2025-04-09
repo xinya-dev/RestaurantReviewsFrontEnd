@@ -48,7 +48,9 @@ const nextConfig = {
       "restaurantreviewsfrontend.netlify.app"
     ],
   },
-  output: 'standalone',
+  output: 'export',
+  trailingSlash: false,
+  staticPageGenerationTimeout: 180,
 };
 
 module.exports = nextConfig;
