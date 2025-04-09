@@ -37,7 +37,7 @@ const RRSearchForm: FC<RRSearchFormProps> = ({
   defaultSearchText,
   defaultSearchDistance,
   defaultSelectedItems,
-  tabClassName = "p-3 h-[80px] w-[85px]"
+  tabClassName = "p-4 h-[100px] w-[95px]"
 }) => {
   const tabs: {id: SearchTab, icon: any, name: string, displayName?: string}[] = [
     {
@@ -105,9 +105,9 @@ const RRSearchForm: FC<RRSearchFormProps> = ({
 
   const renderTab = () => {
     return (
-      <div className="flex flex-col items-center w-full space-y-2">
+      <div className="flex flex-col items-center w-full space-y-4">
         {/* First row - original 6 tabs */}
-        <ul className="flex flex-wrap justify-center gap-1 lg:gap-2 w-full">
+        <ul className="flex flex-wrap justify-center gap-2 lg:gap-3 w-full">
           {tabs.slice(0, 10).map((tab) => {
             const active = tab.id === tabActive;
             const Icon = tab.icon;
@@ -122,7 +122,7 @@ const RRSearchForm: FC<RRSearchFormProps> = ({
                     ? "bg-primary-6000 text-white shadow-lg transform scale-105"
                     : "bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700"
                 }`}>
-                  <Icon className={`w-6 h-6 mb-1 ${active ? "text-white" : "text-neutral-600 dark:text-neutral-400"}`} />
+                  <Icon className={`w-6 h-6 mb-2 ${active ? "text-white" : "text-neutral-600 dark:text-neutral-400"}`} />
                   <span className="text-sm font-medium text-center whitespace-pre-line">
                     {tab.displayName || tab.name}
                   </span>
@@ -170,13 +170,11 @@ const RRSearchForm: FC<RRSearchFormProps> = ({
 
   return (
     <div
-      className={`nc-RRSearchForm w-full max-w-6xl py-2 lg:py-0 ${className}`}
+      className={`nc-RRSearchForm w-full max-w-6xl py-5 lg:py-0 ${className}`}
       id="search-form"
     >
       {renderTab()}
-      <div className="mt-2">
-        {renderForm()}
-      </div>
+      {renderForm()}
     </div>
   );
 };

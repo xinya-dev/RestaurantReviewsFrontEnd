@@ -324,25 +324,18 @@ const PropertyTypeSelect: FC<PropertyTypeSelectProps> = ({
     setTypeOfProperty(updatedOptions);
   }, [activeTab]);  // Remove initialValue from dependencies to prevent rerendering when it changes
 
-  // Update the useEffect that handles initialValue changes
   // Only handle explicit changes to initialValue from props, separate from internal checkbox state
   useEffect(() => {
     if (DEBUG) console.log("[PropertyTypeSelect] initialValue changed:", initialValue);
     
-    // Always update checkbox state whenever initialValue changes
-    const options = getDefaultOptions();
+    // Skip this effect on initial render to avoid conflicts with the default state
+    if (!prevTypeOfPropertyRef.current) {
+      return;
+    }
     
-    if (!initialValue || initialValue.length === 0) {
-      // If initialValue is empty, uncheck all options except "All"
-      if (DEBUG) console.log("[PropertyTypeSelect] Clearing all selections");
-      const updatedOptions = options.map(option => ({
-        ...option,
-        checked: option.name === "All" ? false : false
-      }));
-      setTypeOfProperty(updatedOptions);
-    } else {
-      // For filtered view, only options in initialValue should be checked
-      if (DEBUG) console.log("[PropertyTypeSelect] Setting filtered checked state based on:", initialValue);
+    if (initialValue && initialValue.length > 0) {
+      if (DEBUG) console.log("[PropertyTypeSelect] Updating checkboxes based on new initialValue");
+      const options = getDefaultOptions();
       const allChecked = options.slice(1).every(option => initialValue.includes(option.name));
       const updatedOptions = options.map(option => ({
         ...option,
@@ -350,7 +343,7 @@ const PropertyTypeSelect: FC<PropertyTypeSelectProps> = ({
       }));
       setTypeOfProperty(updatedOptions);
     }
-  }, [initialValue, activeTab]); // Include both initialValue and activeTab in dependencies
+  }, [initialValue]);
 
   const handleCheckboxChange = (index: number, checked: boolean) => {
     // Create a new copy of the state
@@ -389,13 +382,6 @@ const PropertyTypeSelect: FC<PropertyTypeSelectProps> = ({
     if (onChange) {
       // Make sure we pass a new array reference
       onChange([...finalState]);
-    }
-    
-    // Check if all items are unchecked and notify parent component
-    const selectedItems = finalState.filter(item => item.checked && item.name !== "All").map(item => item.name);
-    if (onSelectionChange && selectedItems.length === 0) {
-      // Explicitly notify parent that no items are selected
-      onSelectionChange([]);
     }
   };
 
@@ -494,7 +480,6 @@ const PropertyTypeSelect: FC<PropertyTypeSelectProps> = ({
       
       // Only call onSelectionChange if there's a change
       if (hasChanged) {
-        if (DEBUG) console.log("[PropertyTypeSelect] Selection changed to:", selectedItems);
         onSelectionChange(selectedItems);
       }
       
@@ -502,30 +487,6 @@ const PropertyTypeSelect: FC<PropertyTypeSelectProps> = ({
       prevTypeOfPropertyRef.current = [...typeOfProperty];
     }
   }, [typeOfProperty, onSelectionChange]);
-  
-  // Add a special useEffect to handle the case when all filter pills are removed
-  useEffect(() => {
-    // Check if initialValue is empty but wasn't before
-    if ((!initialValue || initialValue.length === 0) && 
-        prevTypeOfPropertyRef.current && 
-        prevTypeOfPropertyRef.current.some(item => item.checked)) {
-      if (DEBUG) console.log("[PropertyTypeSelect] All filter pills removed, clearing selection");
-      
-      // Set all checkboxes to unchecked
-      const options = getDefaultOptions();
-      const updatedOptions = options.map(option => ({
-        ...option,
-        checked: false
-      }));
-      
-      setTypeOfProperty(updatedOptions);
-      
-      // Explicitly notify parent that no items are selected
-      if (onSelectionChange) {
-        onSelectionChange([]);
-      }
-    }
-  }, [initialValue, onSelectionChange]);
 
   return (
     <Popover className={`flex relative ${className || 'flex-1'}`}>

@@ -81,7 +81,7 @@ const TabFilters = () => {
 
   const renderXClear = () => {
     return (
-      <span className="w-4 h-4 rounded-full bg-primary-500 text-white flex items-center justify-center ml-2 cursor-pointer">
+      <span className="w-4 h-4 rounded-full bg-primary-500 text-white flex items-center justify-center ml-3 cursor-pointer">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           className="h-3 w-3"
@@ -104,7 +104,7 @@ const TabFilters = () => {
         {({ open, close }) => (
           <>
             <Popover.Button
-              className={`flex items-center justify-center px-3 py-1.5 text-sm rounded-full border border-neutral-300 dark:border-neutral-700 hover:border-neutral-400 dark:hover:border-neutral-6000 focus:outline-none ${
+              className={`flex items-center justify-center px-4 py-2 text-sm rounded-full border border-neutral-300 dark:border-neutral-700 hover:border-neutral-400 dark:hover:border-neutral-6000 focus:outline-none ${
                 open ? "!border-primary-500 " : ""
               }`}
             >
@@ -159,7 +159,7 @@ const TabFilters = () => {
         {({ open, close }) => (
           <>
             <Popover.Button
-              className={`flex items-center justify-center px-3 py-1.5 text-sm rounded-full border border-neutral-300 dark:border-neutral-700 hover:border-neutral-400 dark:hover:border-neutral-6000 focus:outline-none ${
+              className={`flex items-center justify-center px-4 py-2 text-sm rounded-full border border-neutral-300 dark:border-neutral-700 hover:border-neutral-400 dark:hover:border-neutral-6000 focus:outline-none ${
                 open ? "!border-primary-500 " : ""
               }`}
             >
@@ -208,9 +208,7 @@ const TabFilters = () => {
         {({ open, close }) => (
           <>
             <Popover.Button
-              className={`flex items-center justify-center px-3 py-1.5 text-sm rounded-full border border-neutral-300 dark:border-neutral-700 hover:border-neutral-400 dark:hover:border-neutral-6000 focus:outline-none ${
-                open ? "!border-primary-500 " : ""
-              }`}
+              className={`flex items-center justify-center px-4 py-2 text-sm rounded-full border border-primary-500 bg-primary-50 text-primary-700 focus:outline-none `}
             >
               <span>
                 {`$${convertNumbThousand(
@@ -351,7 +349,7 @@ const TabFilters = () => {
     return (
       <div>
         <div
-          className={`flex items-center justify-center px-3 py-1.5 text-sm rounded-full border border-primary-500 bg-primary-50 text-primary-700 focus:outline-none cursor-pointer`}
+          className={`flex items-center justify-center px-4 py-2 text-sm rounded-full border border-primary-500 bg-primary-50 text-primary-700 focus:outline-none cursor-pointer`}
           onClick={openModalMoreFilter}
         >
           <span>More filters (3)</span>
@@ -664,14 +662,14 @@ const TabFilters = () => {
   };
 
   return (
-    <div className="flex py-2 lg:py-0 lg:px-2 justify-center">
-      <div className="flex space-x-2 lg:space-x-3">
+    <div className="flex lg:space-x-4">
+      <div className="hidden lg:flex space-x-4">
         {renderTabsTypeOfPlace()}
-        {renderTabsRoomAndBeds()}
         {renderTabsPriceRage()}
+        {renderTabsRoomAndBeds()}
         {renderTabMoreFilter()}
-        {renderTabMoreFilterMobile()}
       </div>
+      {renderTabMoreFilterMobile()}
     </div>
   );
 };
