@@ -61,7 +61,7 @@ const RestaurantSearchForm: FC<RestaurantSearchFormProps> = ({ activeTab = "Near
     
     // Navigate to search results page
     const queryString = queryParams.toString();
-    const url = `/listing-real-estate-map${queryString ? `?${queryString}` : ''}`;
+    const url = `/listing-stay-map${queryString ? `?${queryString}` : ''}`;
     router.push(url as any);
   };
 

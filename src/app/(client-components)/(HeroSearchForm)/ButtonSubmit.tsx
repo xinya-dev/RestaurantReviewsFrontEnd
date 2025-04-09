@@ -10,13 +10,13 @@ interface Props {
 }
 
 const ButtonSubmit: FC<Props> = ({ 
-  href = "/listing-real-estate-map", 
+  href = "/listing-stay-map" as PathName, 
   searchParams = {},
   type = "submit",
   className = ""
 }) => {
   const router = useRouter();
-  const [searchUrl, setSearchUrl] = useState(href);
+  const [searchUrl, setSearchUrl] = useState<string>(href);
 
   // Always update the URL when search parameters change
   useEffect(() => {

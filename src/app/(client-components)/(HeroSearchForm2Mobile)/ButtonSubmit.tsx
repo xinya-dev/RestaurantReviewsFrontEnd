@@ -12,7 +12,7 @@ interface Props {
 const ButtonSubmit: FC<Props> = ({
   className = "",
   onClick = () => {},
-  href = "/listing-real-estate-map",
+  href = "/listing-stay-map" as PathName,
   searchParams = {},
 }) => {
   const router = useRouter();

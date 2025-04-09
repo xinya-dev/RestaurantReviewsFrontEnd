@@ -186,7 +186,20 @@ const HeroSearchForm2Mobile = () => {
                             </Tab>
                           ))}
                         </Tab.List>
-                        <TabsIndicator scrollPosition={scrollPosition} maxScroll={maxScroll} totalDots={5} />
+                        <TabsIndicator 
+                          scrollPosition={scrollPosition} 
+                          maxScroll={maxScroll} 
+                          totalDots={5}
+                          onJumpToPosition={(position) => {
+                            if (tabListRef.current) {
+                              // Smooth scroll to the position
+                              tabListRef.current.scrollTo({
+                                left: position,
+                                behavior: 'smooth'
+                              });
+                            }
+                          }} 
+                        />
                       </div>
 
                       <div className="flex-1 pt-3 px-1.5 sm:px-4 flex overflow-hidden">

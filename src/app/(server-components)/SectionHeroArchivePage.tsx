@@ -22,11 +22,11 @@ const SectionHeroArchivePage: FC<SectionHeroArchivePageProps> = ({
 }) => {
   return (
     <div
-      className={`nc-SectionHeroArchivePage flex flex-col relative ${className}`}
+      className={`nc-SectionHeroArchivePage flex flex-col relative ${className} mt-40`}
       data-nc-id="SectionHeroArchivePage"
     >
       <div className="flex flex-col lg:flex-row lg:items-center">
-        <div className="flex-shrink-0 lg:w-1/2 flex flex-col items-start space-y-6 lg:space-y-10 pb-14 lg:pb-64 xl:pb-80 xl:pr-14 lg:mr-10 xl:mr-0">
+        {/* <div className="flex-shrink-0 lg:w-1/2 flex flex-col items-start space-y-6 lg:space-y-10 pb-14 lg:pb-64 xl:pb-80 xl:pr-14 lg:mr-10 xl:mr-0">
           <h2 className="font-medium text-4xl md:text-5xl xl:text-7xl leading-[110%]">
             Tokyo, Jappan
           </h2>
@@ -43,8 +43,8 @@ const SectionHeroArchivePage: FC<SectionHeroArchivePageProps> = ({
               </>
             )}
           </div>
-        </div>
-        <div className="flex-grow">
+        </div> */}
+        {/* <div className="flex-grow">
           <Image
             className="w-full"
             src={rightImage}
@@ -52,14 +52,15 @@ const SectionHeroArchivePage: FC<SectionHeroArchivePageProps> = ({
             priority
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 50vw"
           />
-        </div>
-      </div>
-
-      <div className="hidden lg:flow-root w-full">
+        </div> */}
+        <div className="hidden lg:flow-root w-full">
         <div className="z-10 lg:-mt-40 xl:-mt-56 w-full">
           <RRSearchForm currentPage={currentPage} currentTab={currentTab} />
         </div>
       </div>
+      </div>
+
+      
     </div>
   );
 };

@@ -48,6 +48,11 @@ const sliderStyles = {
   }
 };
 
+// Transitions for animations
+const valueTransition = {
+  transition: 'all 0.2s ease',
+};
+
 const DistanceRangeInputs: FC<DistanceRangeInputsProps> = ({
   onChange,
   defaultValue,
@@ -59,6 +64,7 @@ const DistanceRangeInputs: FC<DistanceRangeInputsProps> = ({
   const [rangeDistance, setRangeDistance] = useState(
     defaultValue || [0, DEFAULT_DISTANCE]
   );
+  const [isDragging, setIsDragging] = useState(false);
 
   useEffect(() => {
     if (!defaultValue) return;
@@ -75,6 +81,20 @@ const DistanceRangeInputs: FC<DistanceRangeInputsProps> = ({
       200000: <span className="text-xs font-medium mt-1">200km</span>
     };
     return marks;
+  };
+
+  // Calculate what percentage of the max range is selected
+  const getRangePercentage = () => {
+    return ((rangeDistance[1] - rangeDistance[0]) / MAX_DISTANCE) * 100;
+  };
+
+  // Get a color based on the range percentage (more blue for larger ranges)
+  const getRangeColor = () => {
+    const percentage = getRangePercentage();
+    if (percentage > 75) return 'bg-blue-100 dark:bg-blue-900/30'; 
+    if (percentage > 50) return 'bg-blue-50 dark:bg-blue-900/20';
+    if (percentage > 25) return 'bg-blue-50/80 dark:bg-blue-900/10';
+    return 'bg-blue-50/60 dark:bg-blue-900/5';
   };
 
   return (
@@ -95,6 +115,8 @@ const DistanceRangeInputs: FC<DistanceRangeInputsProps> = ({
               setRangeDistance(e as number[]);
               onChange && onChange(e as number[]);
             }}
+            onBeforeChange={() => setIsDragging(true)}
+            onAfterChange={() => setIsDragging(false)}
             marks={generateMarks()}
             trackStyle={[sliderStyles.track]}
             railStyle={sliderStyles.rail}
@@ -104,6 +126,11 @@ const DistanceRangeInputs: FC<DistanceRangeInputsProps> = ({
               ...sliderStyles.dot,
               ...sliderStyles.activeDot
             }}
+            aria-label="Distance range"
+            aria-valuemin={0}
+            aria-valuemax={MAX_DISTANCE}
+            aria-valuenow={rangeDistance[1]}
+            aria-valuetext={`${getDistanceLabel(rangeDistance[0])} to ${getDistanceLabel(rangeDistance[1])}`}
           />
         </div>
 
@@ -123,6 +150,8 @@ const DistanceRangeInputs: FC<DistanceRangeInputsProps> = ({
                 id="minDistance"
                 className="focus:ring-primary-500 focus:border-primary-500 block w-full px-4 sm:text-sm border-neutral-200 rounded-full text-neutral-900 bg-neutral-100 dark:bg-neutral-800 dark:text-white"
                 value={getDistanceLabel(rangeDistance[0])}
+                style={valueTransition}
+                aria-label="Minimum distance"
               />
             </div>
           </div>
@@ -141,12 +170,19 @@ const DistanceRangeInputs: FC<DistanceRangeInputsProps> = ({
                 id="maxDistance"
                 className="focus:ring-primary-500 focus:border-primary-500 block w-full px-4 sm:text-sm border-neutral-200 rounded-full text-neutral-900 bg-neutral-100 dark:bg-neutral-800 dark:text-white"
                 value={getDistanceLabel(rangeDistance[1])}
+                style={valueTransition}
+                aria-label="Maximum distance"
               />
             </div>
           </div>
         </div>
 
-        <div className="text-sm text-neutral-600 dark:text-neutral-400 text-center p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+        <div 
+          className={`text-sm text-neutral-600 dark:text-neutral-400 text-center p-3 rounded-lg transition-all duration-500 ${getRangeColor()} ${isDragging ? 'transform scale-105' : ''}`}
+          style={valueTransition}
+          aria-live="polite"
+          aria-atomic="true"
+        >
           {rangeDistance[0] === 0 
             ? `Showing restaurants within ${getDistanceLabel(rangeDistance[1])} of your location`
             : `Showing restaurants between ${getDistanceLabel(rangeDistance[0])} and ${getDistanceLabel(rangeDistance[1])} from your location`

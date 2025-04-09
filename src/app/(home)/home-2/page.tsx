@@ -28,7 +28,7 @@ import HIW3img from "@/images/HIW2-3.png";
 import HIW1imgDark from "@/images/HIW2-1-dark.png";
 import HIW2imgDark from "@/images/HIW2-2-dark.png";
 import HIW3imgDark from "@/images/HIW2-3-dark.png";
-import rightImgPng from "@/images/our-features-2.png";
+  import rightImgPng from "@/images/our-features-2.png";
 
 import SectionGridFeatureProperty from "../SectionGridFeatureProperty";
 import SectionDowloadApp from "../SectionDowloadApp";
@@ -162,7 +162,7 @@ function PageHome2() {
           <SectionGridFeatureProperty />
         </div>
 
-        <SectionOurFeatures type="type2" rightImg={rightImgPng} />
+        <SectionOurFeatures type="type2" rightImg={rightImgPng.src} />
 
         <SectionDowloadApp />
 
