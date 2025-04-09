@@ -18,7 +18,7 @@ const SectionHeroListing: FC<SectionHeroListingProps> = ({ className = "" }) => 
   const validCategories: SearchTab[] = [
     "Near Me", 
     "International Cuisine", 
-    "Fine Dine", 
+    "Fine Dining", 
     "Casual Dining", 
     "Fast Food", 
     "Child Friendly", 
