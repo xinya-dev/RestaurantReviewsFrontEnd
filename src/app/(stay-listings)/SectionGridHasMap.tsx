@@ -10,6 +10,8 @@ import Pagination from "@/shared/Pagination";
 import TabFilters from "./TabFilters";
 import Heading2 from "@/shared/Heading2";
 import StayCard2 from "@/components/StayCard2";
+import { useSearchParams } from "next/navigation";
+import { MapPinIcon, MagnifyingGlassIcon, AdjustmentsHorizontalIcon } from "@heroicons/react/24/outline";
 
 const DEMO_STAYS = DEMO_STAY_LISTINGS.filter((_, i) => i < 12);
 export interface SectionGridHasMapProps {}
@@ -17,13 +19,92 @@ export interface SectionGridHasMapProps {}
 const SectionGridHasMap: FC<SectionGridHasMapProps> = () => {
   const [currentHoverID, setCurrentHoverID] = useState<string | number>(-1);
   const [showFullMapFixed, setShowFullMapFixed] = useState(false);
+  
+  // Get search parameters from URL
+  const searchParams = useSearchParams();
+  const query = searchParams.get('query') || '';
+  const distance = searchParams.get('distance') || '0-10';
+  const category = searchParams.get('category') || '';
+  const filters = searchParams.get('filters') || '';
+  
+  // Process filters
+  const filterItems = filters ? filters.split(',') : [];
+  
+  // Create subheading content
+  const getSearchContent = () => {
+    return (
+      <div className="mt-3 p-4 bg-neutral-50 dark:bg-neutral-800/50 rounded-xl border border-neutral-200 dark:border-neutral-700">
+        {query && (
+          <div className="flex items-start mb-3">
+            <MagnifyingGlassIcon className="h-5 w-5 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
+            <span className="block text-neutral-600 dark:text-neutral-300 font-medium text-base">
+              You are searching for "<span className="text-blue-600">{query}</span>"
+            </span>
+          </div>
+        )}
+        
+        {filterItems.length > 0 && (
+          <div className="flex items-start mb-3">
+            <AdjustmentsHorizontalIcon className="h-5 w-5 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
+            <div>
+              <span className="block text-neutral-500 dark:text-neutral-400 mb-2">
+                with Filters <span className="font-medium text-neutral-700 dark:text-neutral-200">INTERNATIONAL CUISINES</span>:
+              </span>
+              <div className="flex flex-wrap gap-2 mt-1">
+                {filterItems.map((item) => (
+                  <span 
+                    key={item}
+                    className="inline-flex items-center px-3 py-1.5 rounded-full text-sm bg-blue-100 text-blue-600 border border-blue-200 hover:bg-blue-50 cursor-pointer"
+                  >
+                    {item}
+                    <button className="ml-1.5 text-blue-500 hover:text-blue-700 focus:outline-none">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                      </svg>
+                    </button>
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+        
+        <div className="flex items-start">
+          <MapPinIcon className="h-5 w-5 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
+          <div>
+            <span className="block text-neutral-500 dark:text-neutral-400 mb-2">
+              Distance:
+            </span>
+            <div className="flex flex-wrap gap-2 mt-1">
+              <span className="inline-flex items-center px-3 py-1.5 rounded-full text-sm bg-blue-100 text-blue-600 border border-blue-200 hover:bg-blue-50 cursor-pointer">
+                {distance} Kms
+                <button className="ml-1.5 text-blue-500 hover:text-blue-700 focus:outline-none">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
+                </button>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div>
       <div className="relative flex min-h-screen">
         {/* CARDSSSS */}
         <div className="min-h-screen w-full xl:w-[60%] 2xl:w-[60%] max-w-[1184px] flex-shrink-0 xl:px-8 ">
-          <Heading2 className="!mb-8" />
+          <Heading2 
+            heading={
+              <span className="text-3xl md:text-4xl font-bold text-neutral-900 dark:text-white">
+                Restaurants in Australia
+              </span>
+            }
+            subHeading={getSearchContent()} 
+            className="!mb-8" 
+          />
           <div className="mb-8 lg:mb-11">
             <TabFilters />
           </div>
