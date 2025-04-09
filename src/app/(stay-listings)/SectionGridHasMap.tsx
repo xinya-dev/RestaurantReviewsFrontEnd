@@ -77,7 +77,8 @@ const SectionGridHasMap: FC<SectionGridHasMapProps> = () => {
     }
     
     // Use router to navigate without page refresh
-    router.push(`/listing-stay-map?${newParams.toString()}`);
+    const path = '/listing-stay-map' + (newParams.toString() ? `?${newParams.toString()}` : '');
+    router.push(path as any);
   };
   
   // Handle removing distance filter
@@ -91,7 +92,8 @@ const SectionGridHasMap: FC<SectionGridHasMapProps> = () => {
     newParams.delete('distance');
     
     // Use router to navigate without page refresh
-    router.push(`/listing-stay-map?${newParams.toString()}`);
+    const path = '/listing-stay-map' + (newParams.toString() ? `?${newParams.toString()}` : '');
+    router.push(path as any);
   };
   
   // Format category label
@@ -196,9 +198,13 @@ const SectionGridHasMap: FC<SectionGridHasMapProps> = () => {
   };
 
   return (
-    <div className="SectionGridHasMap" id="restaurant-results">
+    <div className="SectionGridHasMap mt-[-6%]" id="restaurant-results">
+      <div className="mb-4 lg:mb-5 flex justify-center">
+        <TabFilters />
+      </div>
       <div className="relative flex min-h-screen">
         {/* CARDSSSS */}
+        
         <div className="min-h-screen w-full xl:w-[60%] 2xl:w-[60%] max-w-[1184px] flex-shrink-0 xl:px-8 ">
           <Heading2 
             heading={
@@ -207,11 +213,9 @@ const SectionGridHasMap: FC<SectionGridHasMapProps> = () => {
               </span>
             }
             subHeading={getSearchContent()} 
-            className="!mb-8" 
+            className="!mb-4" 
           />
-          <div className="mb-8 lg:mb-11">
-            <TabFilters />
-          </div>
+          
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-5 2xl:gap-x-6 gap-y-8">
             {DEMO_STAYS.map((item) => (
               <div

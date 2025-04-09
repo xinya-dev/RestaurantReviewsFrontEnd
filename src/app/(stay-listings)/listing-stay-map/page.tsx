@@ -12,7 +12,7 @@ const ListingStayMapPage: FC<ListingStayMapPageProps> = ({ params, searchParams 
   console.log("Page searchParams:", searchParams);
 
   return (
-    <div className="container pb-24 lg:pb-28 2xl:pl-10 xl:pr-0 xl:max-w-none">
+    <div className="container pb-12 lg:pb-14 pt-4 2xl:pl-10 xl:pr-0 xl:max-w-none">
       <SectionGridHasMap />
     </div>
   );

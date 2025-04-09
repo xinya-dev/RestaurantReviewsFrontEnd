@@ -66,7 +66,7 @@ const Layout = ({ children, params }: LayoutProps) => {
       <BgGlassmorphism />
 
       {/* SECTION HERO */}
-      <div className="container pt-10 pb-24 lg:pt-16 lg:pb-28 mt-5">
+      <div className="container pt-10 pb-12 lg:pt-16 lg:pb-28 mt-5">
         {/* SectionHeroArchivePage might need to be a Client Component or adjusted */}
         {/* if it relies on props derived from server-only data, but let's try first */}
         <SectionHeroArchivePage 
