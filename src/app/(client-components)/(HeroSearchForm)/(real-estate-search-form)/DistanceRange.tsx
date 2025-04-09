@@ -1,6 +1,6 @@
 "use client";
 
-import React, { Fragment, useState, FC, useContext, useEffect } from "react";
+import React, { Fragment, useState, FC, useContext, useEffect, useRef } from "react";
 import { Popover, Transition } from "@headlessui/react";
 import Slider from "rc-slider";
 import { MapIcon } from "@heroicons/react/24/outline";
@@ -21,6 +21,37 @@ const DistanceRange: FC<DistanceRangeProps> = ({
   onDistanceChange,
   defaultSearchDistance,
 }) => {
+  const popoverButtonRef = useRef<HTMLButtonElement>(null);
+  const [dropdownPosition, setDropdownPosition] = useState<'top' | 'bottom'>('bottom');
+
+  // Add effect to check if dropdown would go out of view
+  useEffect(() => {
+    const updatePosition = () => {
+      if (popoverButtonRef.current) {
+        const buttonRect = popoverButtonRef.current.getBoundingClientRect();
+        const windowHeight = window.innerHeight;
+        const spaceBelow = windowHeight - buttonRect.bottom;
+        const spaceAbove = buttonRect.top;
+        const dropdownHeight = 350; // Approximate height of the dropdown
+        
+        if (spaceBelow < dropdownHeight && spaceAbove > spaceBelow) {
+          setDropdownPosition('top');
+        } else {
+          setDropdownPosition('bottom');
+        }
+      }
+    };
+
+    window.addEventListener('scroll', updatePosition);
+    window.addEventListener('resize', updatePosition);
+    updatePosition();
+
+    return () => {
+      window.removeEventListener('scroll', updatePosition);
+      window.removeEventListener('resize', updatePosition);
+    };
+  }, []);
+
   // Parse the defaultSearchDistance if it exists, otherwise use default range
   const initialRangeDistance = React.useMemo(() => {
     if (defaultSearchDistance) {
@@ -92,6 +123,7 @@ const DistanceRange: FC<DistanceRangeProps> = ({
             }`}
           >
             <Popover.Button
+              ref={popoverButtonRef}
               className={`flex-1 flex text-left items-center focus:outline-none ${fieldClassName} space-x-3 `}
               onClickCapture={() => document.querySelector("html")?.click()}
             >
@@ -122,7 +154,11 @@ const DistanceRange: FC<DistanceRangeProps> = ({
             leaveFrom="opacity-100 translate-y-0"
             leaveTo="opacity-0 translate-y-1"
           >
-            <Popover.Panel className="absolute left-0 lg:right-0 z-10 w-full sm:min-w-[340px] max-w-sm bg-white dark:bg-neutral-800 top-full mt-3 py-5 sm:py-6 px-4 sm:px-8 rounded-3xl shadow-xl">
+            <Popover.Panel className={`absolute left-0 lg:right-0 z-10 w-full sm:min-w-[340px] max-w-sm bg-white dark:bg-neutral-800 ${
+              dropdownPosition === 'top' 
+                ? 'bottom-full mb-3' 
+                : 'top-full mt-3'
+            } py-5 sm:py-6 px-4 sm:px-8 rounded-3xl shadow-xl`}>
               <div className="relative flex flex-col space-y-8">
                 <div className="space-y-5">
                   <span className="font-medium">Distance Range</span>

@@ -30,6 +30,34 @@ const SectionGridHasMap: FC<SectionGridHasMapProps> = () => {
   // Process filters
   const filterItems = filters ? filters.split(',') : [];
   
+  // Format category label
+  const getCategoryLabel = () => {
+    if (!category) return 'All Categories';
+    
+    // Map of special category formats or replacements
+    const categoryMap: Record<string, string> = {
+      'Fast+Food': 'FAST FOOD TYPES',
+      'International+Cuisine': 'INTERNATIONAL CUISINES',
+      'Favourite+Foods': 'FAVOURITE FOODS',
+      'Child+Friendly': 'CHILD FRIENDLY',
+      'Cafés+&+Coffee': 'CAFÉS & COFFEE',
+      'Todays+Specials': 'TODAY\'S SPECIALS',
+      'Fine+Dining': 'FINE DINING',
+      'Casual+Dining': 'CASUAL DINING',
+      'Healthy+Foods': 'HEALTHY FOODS'
+    };
+    
+    // Check if we have a special mapping for this category
+    const formattedCategory = categoryMap[category];
+    if (formattedCategory) return formattedCategory;
+    
+    // Otherwise, transform the category string by replacing '+' with space and capitalizing each word
+    return category.split('+')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ')
+      .toUpperCase();
+  };
+
   // Create subheading content
   const getSearchContent = () => {
     return (
@@ -48,7 +76,7 @@ const SectionGridHasMap: FC<SectionGridHasMapProps> = () => {
             <AdjustmentsHorizontalIcon className="h-5 w-5 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
             <div>
               <span className="block text-neutral-500 dark:text-neutral-400 mb-2">
-                with Filters <span className="font-medium text-neutral-700 dark:text-neutral-200">INTERNATIONAL CUISINES</span>:
+                filtered with <span className="font-medium text-neutral-700 dark:text-neutral-200">{getCategoryLabel()}</span>:
               </span>
               <div className="flex flex-wrap gap-2 mt-1">
                 {filterItems.map((item) => (
@@ -72,7 +100,7 @@ const SectionGridHasMap: FC<SectionGridHasMapProps> = () => {
         <div className="flex items-start">
           <MapPinIcon className="h-5 w-5 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
           <div>
-            <span className="block text-neutral-500 dark:text-neutral-400 mb-2">
+            <span className="block text-bold  dark:text-neutral-400 mb-2">
               Distance:
             </span>
             <div className="flex flex-wrap gap-2 mt-1">

@@ -29,6 +29,7 @@ const RRSearchBox: FC<LocationInputProps> = ({
   const [value, setValue] = useState(initialValue);
   const [showPopover, setShowPopover] = useState(autoFocus);
   const prevValueRef = useRef(value);
+  const [dropdownPosition, setDropdownPosition] = useState<'top' | 'bottom'>('bottom');
 
   useEffect(() => {
     setShowPopover(autoFocus);
@@ -57,6 +58,37 @@ const RRSearchBox: FC<LocationInputProps> = ({
       prevValueRef.current = value;
     }
   }, [value, onChange]);
+
+  // Add effect to check if dropdown would go out of view
+  useEffect(() => {
+    const updatePosition = () => {
+      if (containerRef.current) {
+        const containerRect = containerRef.current.getBoundingClientRect();
+        const windowHeight = window.innerHeight;
+        const spaceBelow = windowHeight - containerRect.bottom;
+        const spaceAbove = containerRect.top;
+        const dropdownHeight = 320; // Approximate max height of dropdown
+
+        if (spaceBelow < dropdownHeight && spaceAbove > spaceBelow) {
+          setDropdownPosition('top');
+        } else {
+          setDropdownPosition('bottom');
+        }
+      }
+    };
+
+    window.addEventListener('scroll', updatePosition);
+    window.addEventListener('resize', updatePosition);
+    
+    if (showPopover) {
+      updatePosition();
+    }
+
+    return () => {
+      window.removeEventListener('scroll', updatePosition);
+      window.removeEventListener('resize', updatePosition);
+    };
+  }, [showPopover]);
 
   const eventClickOutsideDiv = (event: MouseEvent) => {
     if (!containerRef.current) return;
@@ -194,7 +226,11 @@ const RRSearchBox: FC<LocationInputProps> = ({
       )}
 
       {showPopover && (
-        <div className="absolute left-0 z-40 w-full min-w-[300px] sm:min-w-[500px] bg-white dark:bg-neutral-800 top-full mt-3 py-3 sm:py-6 rounded-3xl shadow-xl max-h-96 overflow-y-auto">
+        <div className={`absolute left-0 z-40 w-full min-w-[300px] sm:min-w-[500px] bg-white dark:bg-neutral-800 ${
+          dropdownPosition === 'top' 
+            ? 'bottom-full mb-3' 
+            : 'top-full mt-3'
+        } py-3 sm:py-6 rounded-3xl shadow-xl max-h-96 overflow-y-auto`}>
           {value ? renderSearchValue() : renderRecentSearches()}
         </div>
       )}
