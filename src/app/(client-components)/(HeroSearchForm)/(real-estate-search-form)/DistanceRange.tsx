@@ -11,6 +11,7 @@ export interface DistanceRangeProps {
   fieldClassName?: string;
   activeTab?: string;
   onDistanceChange?: (distanceRange: string) => void;
+  defaultSearchDistance?: string;
 }
 
 const DistanceRange: FC<DistanceRangeProps> = ({
@@ -18,8 +19,40 @@ const DistanceRange: FC<DistanceRangeProps> = ({
   fieldClassName = "[ nc-hero-field-padding ]",
   activeTab = "Near Me",
   onDistanceChange,
+  defaultSearchDistance,
 }) => {
-  const [rangeDistance, setRangeDistance] = useState([0, 10]); // Default range 0-10 km
+  // Parse the defaultSearchDistance if it exists, otherwise use default range
+  const initialRangeDistance = React.useMemo(() => {
+    if (defaultSearchDistance) {
+      const parts = defaultSearchDistance.split('-');
+      if (parts.length === 2) {
+        const min = parseInt(parts[0], 10);
+        const max = parseInt(parts[1], 10);
+        // Validate the values are numbers and within range
+        if (!isNaN(min) && !isNaN(max) && min >= 0 && max <= 50 && min <= max) {
+          return [min, max];
+        }
+      }
+    }
+    return [0, 10]; // Default range 0-10 km
+  }, [defaultSearchDistance]);
+
+  const [rangeDistance, setRangeDistance] = useState(initialRangeDistance);
+
+  // Update the rangeDistance when defaultSearchDistance changes
+  useEffect(() => {
+    if (defaultSearchDistance) {
+      const parts = defaultSearchDistance.split('-');
+      if (parts.length === 2) {
+        const min = parseInt(parts[0], 10);
+        const max = parseInt(parts[1], 10);
+        // Validate the values are numbers and within range
+        if (!isNaN(min) && !isNaN(max) && min >= 0 && max <= 50 && min <= max) {
+          setRangeDistance([min, max]);
+        }
+      }
+    }
+  }, [defaultSearchDistance]);
 
   const formatDistance = (distance: number) => {
     return distance === 0 ? "0" : `${distance}`;
@@ -98,7 +131,7 @@ const DistanceRange: FC<DistanceRangeProps> = ({
                     className="text-blue-600"
                     min={0}
                     max={50} // Maximum 50 km
-                    defaultValue={[rangeDistance[0], rangeDistance[1]]}
+                    value={rangeDistance}
                     allowCross={false}
                     step={0.5} // Half kilometer steps
                     onChange={(e) => setRangeDistance(e as number[])}

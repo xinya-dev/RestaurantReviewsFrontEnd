@@ -11,6 +11,10 @@ export interface SectionHeroArchivePageProps {
   currentPage: SearchTab;
   currentTab: SearchTab;
   rightImage?: StaticImageData;
+  defaultSearchText?: string;
+  defaultSearchDistance?: string;
+  defaultSelectedItems?: string[];
+  tabClassName?: string;
 }
 
 const SectionHeroArchivePage: FC<SectionHeroArchivePageProps> = ({
@@ -19,6 +23,10 @@ const SectionHeroArchivePage: FC<SectionHeroArchivePageProps> = ({
   currentPage,
   currentTab,
   rightImage = imagePng,
+  defaultSearchText,
+  defaultSearchDistance,
+  defaultSelectedItems,
+  tabClassName,
 }) => {
   return (
     <div
@@ -54,10 +62,17 @@ const SectionHeroArchivePage: FC<SectionHeroArchivePageProps> = ({
           />
         </div> */}
         <div className="hidden lg:flow-root w-full">
-        <div className="z-10 lg:-mt-40 xl:-mt-56 w-full">
-          <RRSearchForm currentPage={currentPage} currentTab={currentTab} />
+          <div className="z-10 lg:-mt-40 xl:-mt-56 w-full">
+            <RRSearchForm 
+              currentPage={currentPage} 
+              currentTab={currentTab} 
+              defaultSearchText={defaultSearchText} 
+              defaultSearchDistance={defaultSearchDistance} 
+              defaultSelectedItems={defaultSelectedItems} 
+              tabClassName={tabClassName}
+            />
+          </div>
         </div>
-      </div>
       </div>
 
       

@@ -11,6 +11,7 @@ export interface LocationInputProps {
   divHideVerticalLineClass?: string;
   autoFocus?: boolean;
   onChange?: (value: string) => void;
+  initialValue?: string;
 }
 
 const RRSearchBox: FC<LocationInputProps> = ({
@@ -20,11 +21,12 @@ const RRSearchBox: FC<LocationInputProps> = ({
   className = "nc-flex-1.5",
   divHideVerticalLineClass = "left-10 -right-0.5",
   onChange,
+  initialValue = "",
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const [value, setValue] = useState("");
+  const [value, setValue] = useState(initialValue);
   const [showPopover, setShowPopover] = useState(autoFocus);
   const prevValueRef = useRef(value);
 

@@ -8,15 +8,25 @@ import DistanceRange from "./DistanceRange";
 
 export interface RestaurantSearchFormProps {
   activeTab?: SearchTab;
+  defaultSearchText?: string;
+  defaultSearchDistance?: string;
+  defaultSelectedItems?: string[];
 }
 
-const RestaurantSearchForm: FC<RestaurantSearchFormProps> = ({ activeTab = "Near Me" }) => {
-  const [searchText, setSearchText] = useState("");
-  const [searchDistance, setSearchDistance] = useState("0-10");
-  const [selectedItems, setSelectedItems] = useState<string[]>([]);
+const RestaurantSearchForm: FC<RestaurantSearchFormProps> = ({ 
+  activeTab = "Near Me",
+  defaultSearchText = "",
+  defaultSearchDistance = "0-10",
+  defaultSelectedItems = []
+}) => {
+  const [searchText, setSearchText] = useState(defaultSearchText);
+  const [searchDistance, setSearchDistance] = useState(defaultSearchDistance);
+  const [selectedItems, setSelectedItems] = useState<string[]>(defaultSelectedItems);
   const router = useRouter();
   const searchBoxRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
+
+  console.log("RestaurantSearchForm", defaultSearchText, defaultSearchDistance, defaultSelectedItems);
   
   const showRestaurantType = activeTab === "International Cuisine" || 
                             activeTab === "Fast Food" || 
@@ -105,6 +115,7 @@ const RestaurantSearchForm: FC<RestaurantSearchFormProps> = ({ activeTab = "Near
         <RRSearchBox 
           className="w-full" 
           onChange={handleSearchTextChange}
+          initialValue={defaultSearchText}
         />
       </div>
 
@@ -114,6 +125,7 @@ const RestaurantSearchForm: FC<RestaurantSearchFormProps> = ({ activeTab = "Near
           activeTab={activeTab} 
           className="flex-1" 
           onSelectionChange={handleSelectionChange}
+          initialValue={defaultSelectedItems}
         />
       ) : null}
       
@@ -124,6 +136,7 @@ const RestaurantSearchForm: FC<RestaurantSearchFormProps> = ({ activeTab = "Near
           <DistanceRange 
             activeTab={activeTab}
             onDistanceChange={handleDistanceChange} 
+            defaultSearchDistance={defaultSearchDistance}
           />
         </div>
         

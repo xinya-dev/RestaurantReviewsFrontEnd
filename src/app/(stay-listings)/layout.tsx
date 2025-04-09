@@ -1,3 +1,5 @@
+"use client"; // Make layout a Client Component to use hooks
+
 import BackgroundSection from "@/components/BackgroundSection";
 import BgGlassmorphism from "@/components/BgGlassmorphism";
 import SectionGridAuthorBox from "@/components/SectionGridAuthorBox";
@@ -5,19 +7,81 @@ import SectionSliderNewCategories from "@/components/SectionSliderNewCategories"
 import SectionSubscribe2 from "@/components/SectionSubscribe2";
 import React, { ReactNode } from "react";
 import SectionHeroArchivePage from "../(server-components)/SectionHeroArchivePage";
+import { SearchTab } from "../(client-components)/(HeroSearchForm)/RRSearchForm";
+import { useSearchParams } from 'next/navigation'; // Import the hook
 
-const Layout = ({ children }: { children: ReactNode }) => {
+// Define the expected structure of props (searchParams no longer needed here)
+interface LayoutProps {
+  children: ReactNode;
+  params: {}; 
+}
+
+// Define valid SearchTab values explicitly for validation
+const validSearchTabs: SearchTab[] = [
+  "Near Me", "International Cuisine", "Fine Dining", "Casual Dining", 
+  "Fast Food", "Child Friendly", "Favourite Foods", "Healthy Foods", 
+  "Cafés & Coffee", "Todays Specials"
+];
+
+// Helper function to check if a string is a valid SearchTab
+const isValidSearchTab = (value: string | null): value is SearchTab => {
+  return typeof value === 'string' && (validSearchTabs as string[]).includes(value);
+};
+
+const Layout = ({ children, params }: LayoutProps) => {
+  // Use the hook to get searchParams
+  const searchParams = useSearchParams();
+  
+
+  // Extract search parameters from the hook result
+  const categoryParam = searchParams.get('category');
+  const queryParam = searchParams.get('query');
+  const distanceParam = searchParams.get('distance');
+  const filtersParam = searchParams.get('filters');
+
+  // Debugging: Log the extracted categoryParam
+  console.log("Layout hook categoryParam:", categoryParam);
+
+  // Determine values to pass down, VALIDATING categoryParam
+  const currentTabValue: SearchTab = isValidSearchTab(categoryParam) 
+    ? categoryParam 
+    : "Near Me"; // Default to "Near Me" if param is missing or invalid
+    
+  const defaultSearchTextValue = queryParam || "";
+  const defaultSearchDistanceValue = distanceParam || "0-20"; // Default distance
+  const defaultSelectedItemsValue = filtersParam ? filtersParam.split(',') : []; // Split filters or default to empty array
+  const tabClassNameValue = "p-2 h-[95px] w-[95px] rounded-1xl transition-all duration-200 ";
+
+  // Debugging: Log the values being passed
+  console.log("Layout - Passing to SectionHero:", {
+    currentTabValue,
+    defaultSearchTextValue,
+    defaultSearchDistanceValue,
+    defaultSelectedItemsValue,
+    tabClassNameValue
+  });
+
   return (
     <div className={`nc-ListingStayPage relative `}>
       <BgGlassmorphism />
 
       {/* SECTION HERO */}
-      <div className="container pt-10 pb-24 lg:pt-16 lg:pb-28">
-        <SectionHeroArchivePage currentPage="Near Me" currentTab="Near Me" />
+      <div className="container pt-10 pb-24 lg:pt-16 lg:pb-28 mt-5">
+        {/* SectionHeroArchivePage might need to be a Client Component or adjusted */}
+        {/* if it relies on props derived from server-only data, but let's try first */}
+        <SectionHeroArchivePage 
+          currentPage={currentTabValue} 
+          currentTab={currentTabValue}
+          defaultSearchText={defaultSearchTextValue}
+          defaultSearchDistance={defaultSearchDistanceValue}
+          defaultSelectedItems={defaultSelectedItemsValue}
+          tabClassName={tabClassNameValue}
+        />
       </div>
 
-      {children}
+      {children} {/* Render children passed from the page */}
 
+      {/* Rest of the layout sections */}
       <div className="container overflow-hidden">
         {/* SECTION 1 */}
         <div className="relative py-16">
@@ -30,11 +94,7 @@ const Layout = ({ children }: { children: ReactNode }) => {
             sliderStyle="style2"
           />
         </div>
-
-        {/* SECTION */}
         <SectionSubscribe2 className="py-24 lg:py-28" />
-
-        {/* SECTION */}
         <div className="relative py-16 mb-24 lg:mb-28">
           <BackgroundSection className="bg-orange-50 dark:bg-black dark:bg-opacity-20 " />
           <SectionGridAuthorBox />

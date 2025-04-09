@@ -32,6 +32,7 @@ export interface PropertyTypeSelectProps {
   activeTab?: SearchTab;
   className?: string;
   onSelectionChange?: (selectedItems: string[]) => void;
+  initialValue?: string[];
 }
 
 const cuisineTypes: CuisineType[] = [
@@ -227,13 +228,19 @@ const favouriteFoodTypes: FavouriteFoodType[] = [
   }
 ];
 
+// For debugging component lifecycle
+const DEBUG = false;
+
 const PropertyTypeSelect: FC<PropertyTypeSelectProps> = ({
   onChange,
   fieldClassName = "[ nc-hero-field-padding ]",
   activeTab = "Near Me",
   className,
+  initialValue = [],
   onSelectionChange
 }) => {
+  if (DEBUG) console.log("[PropertyTypeSelect] Rendering with initialValue:", initialValue);
+  
   const getDefaultOptions = () => {
     switch (activeTab) {
       case "International Cuisine":
@@ -247,28 +254,93 @@ const PropertyTypeSelect: FC<PropertyTypeSelectProps> = ({
     }
   };
 
-  const [typeOfProperty, setTypeOfProperty] = React.useState(getDefaultOptions());
+  const [typeOfProperty, setTypeOfProperty] = React.useState(() => {
+    // Get the default options based on active tab
+    const options = getDefaultOptions();
+    
+    // For homepage (no initialValue), all options should be checked
+    if (!initialValue || initialValue.length === 0) {
+      return options.map(option => ({
+        ...option,
+        checked: true // Ensure all are checked on homepage
+      }));
+    }
+    
+    // For filtered view, only options in initialValue should be checked
+    const allChecked = options.slice(1).every(option => initialValue.includes(option.name));
+    return options.map(option => ({
+      ...option,
+      checked: option.name === "All" ? allChecked : initialValue.includes(option.name)
+    }));
+  });
   const [dropdownPosition, setDropdownPosition] = React.useState<'top' | 'bottom'>('bottom');
   const buttonRef = React.useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    setTypeOfProperty(getDefaultOptions());
-  }, [activeTab]);
+    if (DEBUG) console.log("[PropertyTypeSelect] activeTab changed:", activeTab);
+    
+    const options = getDefaultOptions();
+    
+    // For homepage (no initialValue), ensure all options are checked
+    if (!initialValue || initialValue.length === 0) {
+      if (DEBUG) console.log("[PropertyTypeSelect] Setting default checked state for homepage");
+      setTypeOfProperty(options.map(option => ({
+        ...option,
+        checked: true // Ensure all are checked on homepage
+      })));
+      return;
+    }
+    
+    // For filtered view, only options in initialValue should be checked
+    if (DEBUG) console.log("[PropertyTypeSelect] Setting filtered checked state based on:", initialValue);
+    const allChecked = options.slice(1).every(option => initialValue.includes(option.name));
+    const updatedOptions = options.map(option => ({
+      ...option,
+      checked: option.name === "All" ? allChecked : initialValue.includes(option.name)
+    }));
+    setTypeOfProperty(updatedOptions);
+  }, [activeTab]);  // Remove initialValue from dependencies to prevent rerendering when it changes
+
+  // Only handle explicit changes to initialValue from props, separate from internal checkbox state
+  useEffect(() => {
+    if (DEBUG) console.log("[PropertyTypeSelect] initialValue changed:", initialValue);
+    
+    // Skip this effect on initial render to avoid conflicts with the default state
+    if (!prevTypeOfPropertyRef.current) {
+      return;
+    }
+    
+    if (initialValue && initialValue.length > 0) {
+      if (DEBUG) console.log("[PropertyTypeSelect] Updating checkboxes based on new initialValue");
+      const options = getDefaultOptions();
+      const allChecked = options.slice(1).every(option => initialValue.includes(option.name));
+      const updatedOptions = options.map(option => ({
+        ...option,
+        checked: option.name === "All" ? allChecked : initialValue.includes(option.name)
+      }));
+      setTypeOfProperty(updatedOptions);
+    }
+  }, [initialValue]);
 
   const handleCheckboxChange = (index: number, checked: boolean) => {
+    // Create a new copy of the state
     let newState = [...typeOfProperty];
     
     if (index === 0) {
+      // If "All" checkbox is clicked, update all checkboxes to match
       newState = newState.map(item => ({
         ...item,
         checked: checked
       }));
     } else {
+      // Update the specific checkbox that was clicked
       newState[index] = {
         ...newState[index],
         checked: checked
       };
       
+      // Update "All" checkbox based on whether all individual items are checked
+      // The "All" checkbox should only be checked if ALL other checkboxes are checked
       const allIndividualItemsChecked = newState.slice(1).every(item => item.checked);
       
       newState[0] = {
@@ -277,8 +349,17 @@ const PropertyTypeSelect: FC<PropertyTypeSelectProps> = ({
       };
     }
     
-    setTypeOfProperty(newState);
-    onChange && onChange(newState);
+    // Create a completely new array to ensure React detects the change
+    const finalState = [...newState];
+    
+    // Update the state with the new array
+    setTypeOfProperty(finalState);
+    
+    // Call external onChange handler
+    if (onChange) {
+      // Make sure we pass a new array reference
+      onChange([...finalState]);
+    }
   };
 
   const isCuisineType = (item: any): item is CuisineType => {
@@ -393,7 +474,6 @@ const PropertyTypeSelect: FC<PropertyTypeSelectProps> = ({
             className={`flex z-10 text-left w-full flex-shrink-0 items-center ${fieldClassName} space-x-3 focus:outline-none cursor-pointer ${
               open ? "nc-hero-field-focused" : ""
               }`}
-            onClickCapture={() => document.querySelector("html")?.click()}
           >
             <div className="text-neutral-300 dark:text-neutral-400">
               <Icon className="w-5 h-5 lg:w-7 lg:h-7" />
@@ -466,7 +546,13 @@ const PropertyTypeSelect: FC<PropertyTypeSelectProps> = ({
                             type="checkbox"
                             className="focus:ring-action-primary h-6 w-6 text-primary-500 border-primary rounded border-neutral-500 bg-white dark:bg-neutral-700 dark:checked:bg-primary-500 focus:ring-primary-500"
                             checked={item.checked}
-                            onChange={(e) => handleCheckboxChange(index, e.target.checked)}
+                            onChange={(e) => {
+                              // Prevent event bubbling and ensure clean handling
+                              e.stopPropagation();
+                              e.preventDefault();
+                              // Call handleCheckboxChange with the index and new checked state
+                              handleCheckboxChange(index, !item.checked);
+                            }}
                           />
                         </div>
                         {isCuisineType(item) && item.flag !== 'all' && (
@@ -484,6 +570,10 @@ const PropertyTypeSelect: FC<PropertyTypeSelectProps> = ({
                           <label
                             htmlFor={`${activeTab}-${item.name}`}
                             className="flex flex-col cursor-pointer"
+                            onClick={(e) => {
+                              // Prevent label click from interfering with checkbox
+                              e.stopPropagation();
+                            }}
                           >
                             <span className="font-medium text-neutral-900 dark:text-neutral-100">
                               {item.name}

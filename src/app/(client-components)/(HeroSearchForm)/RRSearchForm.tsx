@@ -17,18 +17,27 @@ import {
   StarIcon
 } from "@heroicons/react/24/outline";
 
-export type SearchTab = "Near Me" | "International Cuisine" | "Fine Dine" | "Casual Dining" | "Fast Food" | "Child Friendly" | "Favourite Foods" | "Healthy Foods" | "Cafés & Coffee" | "Todays Specials";
+export type SearchTab = "Near Me" | "International Cuisine" | "Fine Dining" | "Casual Dining" | "Fast Food" | "Child Friendly" | "Favourite Foods"
+ | "Healthy Foods" | "Cafés & Coffee" | "Todays Specials";
 
 export interface RRSearchFormProps {
   className?: string;
   currentTab?: SearchTab;
   currentPage?: SearchTab;
+  defaultSearchText?: string;
+  defaultSearchDistance?: string;
+  defaultSelectedItems?: string[];
+  tabClassName?: string;
 }
 
 const RRSearchForm: FC<RRSearchFormProps> = ({
   className = "",
   currentTab = "Near Me",
   currentPage,
+  defaultSearchText,
+  defaultSearchDistance,
+  defaultSelectedItems,
+  tabClassName = "p-4 h-[100px] w-[95px]"
 }) => {
   const tabs: {id: SearchTab, icon: any, name: string, displayName?: string}[] = [
     {
@@ -40,12 +49,13 @@ const RRSearchForm: FC<RRSearchFormProps> = ({
       id: "International Cuisine",
       icon: GlobeAsiaAustraliaIcon,
       name: "International Cuisine",
-      displayName: "International\nCuisine"
+      displayName: "International\nCuisines"
     },
     {
-      id: "Fine Dine",
+      id: "Fine Dining",
       icon: SparklesIcon,
-      name: "Fine Dine"
+      name: "Fine Dining",
+      displayName: "Fine\nDining"
     },
     {
       id: "Casual Dining",
@@ -56,7 +66,8 @@ const RRSearchForm: FC<RRSearchFormProps> = ({
     {
       id: "Fast Food",
       icon: BoltIcon,
-      name: "Fast Food"
+      name: "Fast Food",
+      displayName: "Fast\nFood"
     },
     {
       id: "Child Friendly",
@@ -96,26 +107,22 @@ const RRSearchForm: FC<RRSearchFormProps> = ({
     return (
       <div className="flex flex-col items-center w-full space-y-4">
         {/* First row - original 6 tabs */}
-        <ul className="flex flex-wrap justify-center gap-4 lg:gap-6">
-          {tabs.slice(0, 6).map((tab) => {
+        <ul className="flex flex-wrap justify-center gap-2 lg:gap-3 w-full">
+          {tabs.slice(0, 10).map((tab) => {
             const active = tab.id === tabActive;
             const Icon = tab.icon;
             return (
               <li
                 onClick={() => setTabActive(tab.id)}
-                className={`flex-shrink-0 cursor-pointer group ${
-                  active ? "cursor-default" : ""
-                }`}
+                className={`flex-shrink-0 cursor-pointer group ${active ? "cursor-default" : ""}`}
                 key={tab.id}
               >
-                <div className={`flex flex-col items-center justify-center p-4 h-[100px] w-[100px] rounded-2xl transition-all duration-200 ${
+                <div className={`flex flex-col items-center justify-center rounded-2xl transition-all duration-200 ${tabClassName} ${
                   active 
                     ? "bg-primary-6000 text-white shadow-lg transform scale-105"
                     : "bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700"
                 }`}>
-                  <Icon className={`w-6 h-6 mb-2 ${
-                    active ? "text-white" : "text-neutral-600 dark:text-neutral-400"
-                  }`} />
+                  <Icon className={`w-6 h-6 mb-2 ${active ? "text-white" : "text-neutral-600 dark:text-neutral-400"}`} />
                   <span className="text-sm font-medium text-center whitespace-pre-line">
                     {tab.displayName || tab.name}
                   </span>
@@ -125,7 +132,7 @@ const RRSearchForm: FC<RRSearchFormProps> = ({
           })}
         </ul>
         {/* Second row - new tabs */}
-        <ul className="flex flex-wrap justify-center gap-4 lg:gap-6">
+        {/* <ul className="flex flex-wrap justify-center gap-4 lg:gap-6">
           {tabs.slice(6).map((tab) => {
             const active = tab.id === tabActive;
             const Icon = tab.icon;
@@ -152,13 +159,13 @@ const RRSearchForm: FC<RRSearchFormProps> = ({
               </li>
             );
           })}
-        </ul>
+        </ul> */}
       </div>
     );
   };
 
   const renderForm = () => {
-    return <RestaurantSearchForm activeTab={tabActive} />;
+    return <RestaurantSearchForm activeTab={tabActive} defaultSearchText={defaultSearchText} defaultSearchDistance={defaultSearchDistance} defaultSelectedItems={defaultSelectedItems} />;
   };
 
   return (
