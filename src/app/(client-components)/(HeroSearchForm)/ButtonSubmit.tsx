@@ -9,6 +9,8 @@ interface Props {
   className?: string;
 }
 
+const SEARCH_FLAG_KEY = "nc_should_scroll_to_results";
+
 const ButtonSubmit: FC<Props> = ({ 
   href = "/listing-stay-map" as PathName, 
   searchParams = {},
@@ -32,9 +34,51 @@ const ButtonSubmit: FC<Props> = ({
     const finalUrl = `${href}${queryString ? `?${queryString}` : ''}`;
     setSearchUrl(finalUrl);
   }, [searchParams, href]);
+  
+  // Check on component mount if we need to scroll
+  useEffect(() => {
+    const shouldScroll = localStorage.getItem(SEARCH_FLAG_KEY);
+    if (shouldScroll === "true") {
+      // Clear the flag immediately
+      localStorage.removeItem(SEARCH_FLAG_KEY);
+      
+      // Add a delay to allow the page to fully render
+      setTimeout(() => {
+        scrollToResultsSection();
+      }, 1000);
+    }
+  }, []);
+  
+  // Function to scroll to results section
+  const scrollToResultsSection = () => {
+    // Try multiple selectors to find the right section
+    const sectionElement = 
+      document.querySelector('.SectionGridHasMap') || 
+      document.querySelector('.listing-stay-map') ||
+      document.getElementById('restaurant-results');
+    
+    if (sectionElement) {
+      // Smooth scroll to the element
+      sectionElement.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      });
+      console.log('Scrolled to results section');
+    } else {
+      console.log('Could not find results section to scroll to');
+      // Fallback: scroll some distance down the page
+      window.scrollTo({
+        top: 400, // Approximate position where results might be
+        behavior: 'smooth'
+      });
+    }
+  };
 
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
+    
+    // Set flag in localStorage to indicate we should scroll after navigation
+    localStorage.setItem(SEARCH_FLAG_KEY, "true");
     
     // For submit type, attempt to submit the form
     if (type === "submit") {
@@ -49,6 +93,15 @@ const ButtonSubmit: FC<Props> = ({
     // If not in a form or type is button, navigate directly with current parameters
     console.log("Navigating to:", searchUrl);
     router.push(searchUrl as any);
+    
+    // For same-page navigation, we might need to scroll directly
+    setTimeout(() => {
+      // Check if flag is still there (navigation might not have caused a page reload)
+      if (localStorage.getItem(SEARCH_FLAG_KEY) === "true") {
+        localStorage.removeItem(SEARCH_FLAG_KEY);
+        scrollToResultsSection();
+      }
+    }, 1000);
   };
 
   return (

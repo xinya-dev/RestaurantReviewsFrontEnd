@@ -5,6 +5,7 @@ import { Popover, Transition } from "@headlessui/react";
 import Slider from "rc-slider";
 import { MapIcon } from "@heroicons/react/24/outline";
 import { PathName } from "@/routers/types";
+import { useSearchParams } from "next/navigation";
 
 export interface DistanceRangeProps {
   onChange?: (data: any) => void;
@@ -23,6 +24,28 @@ const DistanceRange: FC<DistanceRangeProps> = ({
 }) => {
   const popoverButtonRef = useRef<HTMLButtonElement>(null);
   const [dropdownPosition, setDropdownPosition] = useState<'top' | 'bottom'>('bottom');
+  
+  // Listen for the custom dropdown event
+  useEffect(() => {
+    const handleOpenSearchDropdown = (event: Event) => {
+      // Check if the event is our custom event and type is 'distance'
+      if (event instanceof CustomEvent && 
+          event.detail && 
+          event.detail.type === 'distance' && 
+          popoverButtonRef.current) {
+        // Click the button to open the dropdown
+        popoverButtonRef.current.click();
+      }
+    };
+    
+    // Add event listener
+    window.addEventListener('openSearchDropdown', handleOpenSearchDropdown);
+    
+    // Clean up
+    return () => {
+      window.removeEventListener('openSearchDropdown', handleOpenSearchDropdown);
+    };
+  }, []);
 
   // Add effect to check if dropdown would go out of view
   useEffect(() => {

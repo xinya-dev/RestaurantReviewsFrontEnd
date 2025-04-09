@@ -1,4 +1,4 @@
-import React, { FC } from "react";
+import React, { FC, useEffect } from "react";
 import { PathName } from "@/routers/types";
 import { useRouter } from "next/navigation";
 
@@ -9,6 +9,8 @@ interface Props {
   searchParams?: Record<string, string>;
 }
 
+const SEARCH_FLAG_KEY = "nc_should_scroll_to_results";
+
 const ButtonSubmit: FC<Props> = ({
   className = "",
   onClick = () => {},
@@ -16,6 +18,45 @@ const ButtonSubmit: FC<Props> = ({
   searchParams = {},
 }) => {
   const router = useRouter();
+  
+  // Check on component mount if we need to scroll
+  useEffect(() => {
+    const shouldScroll = localStorage.getItem(SEARCH_FLAG_KEY);
+    if (shouldScroll === "true") {
+      // Clear the flag immediately
+      localStorage.removeItem(SEARCH_FLAG_KEY);
+      
+      // Add a delay to allow the page to fully render
+      setTimeout(() => {
+        scrollToResultsSection();
+      }, 1000);
+    }
+  }, []);
+  
+  // Function to scroll to results section
+  const scrollToResultsSection = () => {
+    // Try multiple selectors to find the right section
+    const sectionElement = 
+      document.querySelector('.SectionGridHasMap') || 
+      document.querySelector('.listing-stay-map') ||
+      document.getElementById('restaurant-results');
+    
+    if (sectionElement) {
+      // Smooth scroll to the element
+      sectionElement.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      });
+      console.log('Scrolled to results section');
+    } else {
+      console.log('Could not find results section to scroll to');
+      // Fallback: scroll some distance down the page
+      window.scrollTo({
+        top: 400, // Approximate position where results might be
+        behavior: 'smooth'
+      });
+    }
+  };
 
   const handleSearch = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -31,11 +72,23 @@ const ButtonSubmit: FC<Props> = ({
     const queryString = queryParams.toString();
     const finalUrl = `${href}${queryString ? `?${queryString}` : ''}`;
     
+    // Set flag in localStorage to indicate we should scroll after navigation
+    localStorage.setItem(SEARCH_FLAG_KEY, "true");
+    
     // Navigate to the search results page
     router.push(finalUrl as any);
     
     // Also call any additional onClick handler
     onClick();
+    
+    // For same-page navigation, we might need to scroll directly
+    setTimeout(() => {
+      // Check if flag is still there (navigation might not have caused a page reload)
+      if (localStorage.getItem(SEARCH_FLAG_KEY) === "true") {
+        localStorage.removeItem(SEARCH_FLAG_KEY);
+        scrollToResultsSection();
+      }
+    }, 1000);
   };
 
   return (

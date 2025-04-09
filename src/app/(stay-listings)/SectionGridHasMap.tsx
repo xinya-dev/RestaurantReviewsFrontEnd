@@ -10,8 +10,15 @@ import Pagination from "@/shared/Pagination";
 import TabFilters from "./TabFilters";
 import Heading2 from "@/shared/Heading2";
 import StayCard2 from "@/components/StayCard2";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { MapPinIcon, MagnifyingGlassIcon, AdjustmentsHorizontalIcon } from "@heroicons/react/24/outline";
+
+// Global event for dropdown controls without URL params
+const triggerDropdownOpen = (type: 'filter' | 'distance') => {
+  // Create and dispatch a custom event
+  const event = new CustomEvent('openSearchDropdown', { detail: { type } });
+  window.dispatchEvent(event);
+};
 
 const DEMO_STAYS = DEMO_STAY_LISTINGS.filter((_, i) => i < 12);
 export interface SectionGridHasMapProps {}
@@ -19,6 +26,7 @@ export interface SectionGridHasMapProps {}
 const SectionGridHasMap: FC<SectionGridHasMapProps> = () => {
   const [currentHoverID, setCurrentHoverID] = useState<string | number>(-1);
   const [showFullMapFixed, setShowFullMapFixed] = useState(false);
+  const router = useRouter();
   
   // Get search parameters from URL
   const searchParams = useSearchParams();
@@ -29,6 +37,62 @@ const SectionGridHasMap: FC<SectionGridHasMapProps> = () => {
   
   // Process filters
   const filterItems = filters ? filters.split(',') : [];
+  
+  // Handle clicking on filter pills - scroll to top and open dropdown
+  const handleFilterPillClick = (type: 'filter' | 'distance') => {
+    // Find the search form element
+    const searchFormElement = document.getElementById('search-form');
+    
+    // If element found, scroll to it
+    if (searchFormElement) {
+      searchFormElement.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      // Fallback: scroll to top of the page
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    }
+    
+    // Wait for scroll to complete before triggering the dropdown
+    setTimeout(() => {
+      triggerDropdownOpen(type);
+    }, 800);
+  };
+  
+  // Handle removing a filter
+  const handleRemoveFilter = (filterToRemove: string, e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent triggering the parent onClick
+    
+    // Create a new URLSearchParams object to construct the new URL
+    const newParams = new URLSearchParams(searchParams.toString());
+    
+    // Remove the selected filter from the filters
+    const newFilters = filterItems.filter(item => item !== filterToRemove);
+    
+    if (newFilters.length > 0) {
+      newParams.set('filters', newFilters.join(','));
+    } else {
+      newParams.delete('filters');
+    }
+    
+    // Use router to navigate without page refresh
+    router.push(`/listing-stay-map?${newParams.toString()}`);
+  };
+  
+  // Handle removing distance filter
+  const handleRemoveDistance = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent triggering the parent onClick
+    
+    // Create a new URLSearchParams object to construct the new URL
+    const newParams = new URLSearchParams(searchParams.toString());
+    
+    // Remove the distance parameter
+    newParams.delete('distance');
+    
+    // Use router to navigate without page refresh
+    router.push(`/listing-stay-map?${newParams.toString()}`);
+  };
   
   // Format category label
   const getCategoryLabel = () => {
@@ -83,9 +147,14 @@ const SectionGridHasMap: FC<SectionGridHasMapProps> = () => {
                   <span 
                     key={item}
                     className="inline-flex items-center px-3 py-1.5 rounded-full text-sm bg-blue-100 text-blue-600 border border-blue-200 hover:bg-blue-50 cursor-pointer"
+                    onClick={() => handleFilterPillClick('filter')}
                   >
                     {item}
-                    <button className="ml-1.5 text-blue-500 hover:text-blue-700 focus:outline-none">
+                    <button 
+                      className="ml-1.5 text-blue-500 hover:text-blue-700 focus:outline-none"
+                      onClick={(e) => handleRemoveFilter(item, e)}
+                      aria-label={`Remove ${item} filter`}
+                    >
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                         <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
                       </svg>
@@ -104,9 +173,16 @@ const SectionGridHasMap: FC<SectionGridHasMapProps> = () => {
               Distance:
             </span>
             <div className="flex flex-wrap gap-2 mt-1">
-              <span className="inline-flex items-center px-3 py-1.5 rounded-full text-sm bg-blue-100 text-blue-600 border border-blue-200 hover:bg-blue-50 cursor-pointer">
+              <span 
+                className="inline-flex items-center px-3 py-1.5 rounded-full text-sm bg-blue-100 text-blue-600 border border-blue-200 hover:bg-blue-50 cursor-pointer"
+                onClick={() => handleFilterPillClick('distance')}
+              >
                 {distance} Kms
-                <button className="ml-1.5 text-blue-500 hover:text-blue-700 focus:outline-none">
+                <button 
+                  className="ml-1.5 text-blue-500 hover:text-blue-700 focus:outline-none"
+                  onClick={(e) => handleRemoveDistance(e)}
+                  aria-label="Remove distance filter"
+                >
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                     <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
                   </svg>
@@ -120,7 +196,7 @@ const SectionGridHasMap: FC<SectionGridHasMapProps> = () => {
   };
 
   return (
-    <div>
+    <div className="SectionGridHasMap" id="restaurant-results">
       <div className="relative flex min-h-screen">
         {/* CARDSSSS */}
         <div className="min-h-screen w-full xl:w-[60%] 2xl:w-[60%] max-w-[1184px] flex-shrink-0 xl:px-8 ">

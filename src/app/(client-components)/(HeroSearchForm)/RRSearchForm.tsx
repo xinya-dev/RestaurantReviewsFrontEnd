@@ -171,6 +171,7 @@ const RRSearchForm: FC<RRSearchFormProps> = ({
   return (
     <div
       className={`nc-RRSearchForm w-full max-w-6xl py-5 lg:py-0 ${className}`}
+      id="search-form"
     >
       {renderTab()}
       {renderForm()}
