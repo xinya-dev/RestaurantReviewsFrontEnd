@@ -37,6 +37,9 @@ const EXTENDED_NAV: ExtendedNavItem[] = [
     name: "Home",
     icon: HomeIcon,
   },
+  { id: "post-review", name: "Post a Review or Photo", href: "/post-review" as PathName, icon: HomeIcon },
+  { id: "services", name: "Our Services", href: "/services" as PathName, icon: HomeIcon },
+  { id: "support-contact", name: "Support/ Contact", href: "/contact" as PathName, icon: HomeIcon },
   {
     id: "about",
     href: "/about" as PathName,

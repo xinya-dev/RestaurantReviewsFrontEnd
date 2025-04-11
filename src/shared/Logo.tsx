@@ -5,6 +5,7 @@ import LogoSvgLight from "./LogoSvgLight";
 import LogoSvg from "./LogoSvg";
 import Link from "next/link";
 import { StaticImageData } from "next/image";
+import Image from "next/image";
 
 export interface LogoProps {
   img?: StaticImageData;
@@ -20,10 +21,31 @@ const Logo: React.FC<LogoProps> = ({
   return (
     <Link
       href="/"
-      className={`ttnc-logo inline-block text-primary-6000 focus:outline-none focus:ring-0 ${className}`}
+      className={`ttnc-logo inline-block text-primary-6000 focus:outline-none focus:ring-0 ${className} flex items-center`}
     >
-      <LogoSvgLight />
-      <LogoSvg />
+      {/* Original SVG logos - comment out but keep for reference */}
+      {/* <LogoSvgLight />
+      <LogoSvg /> */}
+
+      {/* Restaurant logo with text */}
+      <div className="flex items-center justify-center">
+        {/* Logo image */}
+        <div className="w-12 h-12 relative">
+          <Image 
+            src="/images/RRLogo.png" 
+            alt="Restaurant Reviews Logo" 
+            width={72} 
+            height={72}
+            className="object-contain" 
+          />
+        </div>
+        
+        {/* Text beside logo */}
+        <div className="ml-3 flex flex-col">
+          <span className="text-xl font-extrabold leading-none text-neutral-900 dark:text-white">Restaurant</span>
+          <span className="text-xl font-extrabold leading-none text-neutral-900 dark:text-white">Reviews</span>
+        </div>
+      </div>
 
       {/* THIS USE FOR MY CLIENT */}
       {/* PLEASE UN COMMENT BELLOW CODE AND USE IT */}

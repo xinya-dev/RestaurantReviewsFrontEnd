@@ -16,8 +16,8 @@ export interface LocationInputProps {
 
 const RRSearchBox: FC<LocationInputProps> = ({
   autoFocus = false,
-  placeHolder = "Type a search term",
-  desc = "What are you looking for?",
+  placeHolder = "Enter Town Name",
+  desc = "Current Location or Enter town name",
   className = "nc-flex-1.5",
   divHideVerticalLineClass = "left-10 -right-0.5",
   onChange,

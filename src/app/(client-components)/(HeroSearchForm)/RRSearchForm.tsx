@@ -17,8 +17,7 @@ import {
   StarIcon
 } from "@heroicons/react/24/outline";
 
-export type SearchTab = "Near Me" | "International Cuisine" | "Fine Dining" | "Casual Dining" | "Fast Food" | "Child Friendly" | "Favourite Foods"
- | "Healthy Foods" | "Cafés & Coffee" | "Todays Specials";
+export type SearchTab = "Near Me" | "International Cuisine" | "Restaurant Type" | "Favourite Foods" | "Todays Specials" | "Fast Food" | "Child Friendly" | "Healthy Foods" | "Cafés & Coffee" | "Fine Dining" | "Casual Dining";
 
 export interface RRSearchFormProps {
   className?: string;
@@ -52,47 +51,19 @@ const RRSearchForm: FC<RRSearchFormProps> = ({
       displayName: "International\nCuisines"
     },
     {
-      id: "Fine Dining",
+      id: "Restaurant Type",
       icon: SparklesIcon,
-      name: "Fine Dining",
-      displayName: "Fine\nDining"
+      name: "Restaurant Type",
+      displayName: "Restaurant\nType"
     },
-    {
-      id: "Casual Dining",
-      icon: BuildingStorefrontIcon,
-      name: "Casual Dining",
-      displayName: "Casual\nDining"
-    },
-    {
-      id: "Fast Food",
-      icon: BoltIcon,
-      name: "Fast Food",
-      displayName: "Fast\nFood"
-    },
-    {
-      id: "Child Friendly",
-      icon: FaceSmileIcon,
-      name: "Child Friendly",
-      displayName: "Child\nFriendly"
-    },
+   
     {
       id: "Favourite Foods",
       icon: HeartIcon,
       name: "Favourite Foods",
       displayName: "Favourite\nFoods"
     },
-    {
-      id: "Healthy Foods",
-      icon: FireIcon,
-      name: "Healthy Foods",
-      displayName: "Healthy\nFoods"
-    },
-    {
-      id: "Cafés & Coffee",
-      icon: CakeIcon,
-      name: "Cafés & Coffee",
-      displayName: "Cafés &\nCoffee"
-    },
+   
     {
       id: "Todays Specials",
       icon: StarIcon,

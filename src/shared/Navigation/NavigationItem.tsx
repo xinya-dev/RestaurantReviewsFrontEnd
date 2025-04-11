@@ -257,8 +257,8 @@ const NavigationItem: FC<NavigationItemWithRouterProps> = ({ menuItem }) => {
     const isActive = pathname === item.href;
     return (
       <Link
-        className={`inline-flex items-center text-sm xl:text-base font-normal text-neutral-700 dark:text-neutral-300 py-2 px-4 xl:px-5 rounded-full hover:text-neutral-900 hover:bg-neutral-100 dark:hover:bg-neutral-800 dark:hover:text-neutral-200 ${
-          isActive ? "bg-primary-50 text-primary-900 dark:bg-primary-900 dark:text-primary-100" : ""
+        className={`inline-flex items-center text-sm xl:text-base font-normal text-neutral-700 dark:text-neutral-300 py-2 px-4 xl:px-5 rounded-full hover:text-neutral-900 hover:bg-neutral-100 dark:hover:bg-neutral-200 dark:hover:text-neutral-1200 ${
+          isActive ? "bg-primary-50 text-primary-300 dark:bg-primary-300 dark:text-primary-00" : ""
         }`}
         href={item.href || ""}
       >
@@ -280,7 +280,7 @@ const NavigationItem: FC<NavigationItemWithRouterProps> = ({ menuItem }) => {
       return renderDropdownMenu(menuItem);
     default:
       return (
-        <li className="menu-item flex items-center">
+        <li className="flex items-center ">
           {renderMainItem(menuItem)}
         </li>
       );

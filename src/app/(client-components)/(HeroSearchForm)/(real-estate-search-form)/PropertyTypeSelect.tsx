@@ -7,25 +7,94 @@ import { HomeIcon } from "@heroicons/react/24/outline";
 
 const defaultPropertyType: ClassOfProperties[] = [
   {
-    name: "Duplex House",
-    description: "Have a place to yourself",
+    name: "Family Restaurant",
+    description: "Kid-friendly, casual with larger portions.",
     checked: true,
   },
   {
-    name: "Ferme House",
-    description: "Have your own room and share some common spaces",
-    checked: false,
+    name: "Fine Dining",
+    description: "High-end, full-service with premium menu and elegant ambiance ideal for romantic dinners.",
+    checked: true,
   },
   {
-    name: "Chalet House",
-    description:
-      "Have a private or shared room in a boutique hotel, hostel, and more",
-    checked: false,
+    name: "Casual Dining",
+    description: "Sit-down service with moderate pricing and varied menu.",
+    checked: true,
   },
   {
-    name: "Maison House",
-    description: "Stay in a shared space, like a common room",
-    checked: false,
+    name: "Fast Casual",
+    description: "Higher quality than fast food, no table service.",
+    checked: true,
+  },
+  {
+    name: "Fast Food",
+    description: "Quick service, often drive-thru or takeaway focused.",
+    checked: true,
+  },
+  {
+    name: "Café / Coffee Shop",
+    description: "Light meals, coffee, pastries, relaxed setting.",
+    checked: true,
+  },
+  {
+    name: "Buffet",
+    description: "All-you-can-eat or self-service restaurant.",
+    checked: true,
+  },
+  {
+    name: "Food Truck",
+    description: "Mobile kitchen offering niche or gourmet street food.",
+    checked: true,
+  },
+  {
+    name: "Steakhouse",
+    description: "Specializes in beef and grilled meats.",
+    checked: true,
+  },
+  {
+    name: "Seafood Restaurant",
+    description: "Focuses on fish, oysters, and other seafood dishes.",
+    checked: true,
+  },
+  {
+    name: "Healthy / Vegan / Vegetarian",
+    description: "Offers only plant-based or vegetarian meals.",
+    checked: true,
+  },
+  {
+    name: "Dessert Bar",
+    description: "Focus on sweets — gelato, cakes, pancakes, etc.",
+    checked: true,
+  },
+  {
+    name: "Breakfast / Brunch",
+    description: "Serves morning and mid-day meals.",
+    checked: true,
+  },
+  {
+    name: "Tapas / Small Plates",
+    description: "Share-style small dishes.",
+    checked: true,
+  },
+  {
+    name: "Bar & Grill / Gastropub",
+    description: "Upscale pub-style food with alcohol.",
+    checked: true,
+  },
+  {
+    name: "Take Away",
+    description: "",
+    checked: true,
+  },
+  {
+    name: "Dinner & Drinks",
+    description: "",
+    checked: true,
+  },
+  {
+    name: "Bars & Clubs",
+    description: "",
+    checked: true,
   },
 ];
 
@@ -40,6 +109,7 @@ const PropertyTypeSelect: FC<PropertyTypeSelectProps> = ({
 }) => {
   const [typeOfProperty, setTypeOfProperty] =
     React.useState<ClassOfProperties[]>(defaultPropertyType);
+  const [searchTerm, setSearchTerm] = React.useState("");
 
   let typeOfPropertyText = "";
   if (typeOfProperty && typeOfProperty.length > 0) {
@@ -50,6 +120,15 @@ const PropertyTypeSelect: FC<PropertyTypeSelectProps> = ({
       })
       .join(", ");
   }
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value.toLowerCase());
+  };
+
+  const filteredProperties = typeOfProperty.filter((item) =>
+    item.name.toLowerCase().includes(searchTerm)
+  );
+
   return (
     <Popover className="flex relative flex-1">
       {({ open, close }) => (
@@ -65,11 +144,11 @@ const PropertyTypeSelect: FC<PropertyTypeSelectProps> = ({
             <div className="flex-1">
               <span className="block xl:text-lg font-semibold overflow-hidden">
                 <span className="line-clamp-1">
-                  {typeOfPropertyText || `Type`}
+                  All...
                 </span>
               </span>
               <span className="block mt-1 text-sm text-neutral-400 leading-none font-light ">
-                Property type
+                Select Property Type
               </span>
             </div>
           </Popover.Button>
@@ -87,10 +166,33 @@ const PropertyTypeSelect: FC<PropertyTypeSelectProps> = ({
             leaveFrom="opacity-100 translate-y-0"
             leaveTo="opacity-0 translate-y-1"
           >
-            <Popover.Panel className="absolute left-0 z-10 w-full sm:min-w-[340px] max-w-sm bg-white dark:bg-neutral-800 top-full mt-3 py-5 sm:py-6 px-4 sm:px-8 rounded-3xl shadow-xl">
+            <Popover.Panel className="absolute left-0 z-10 w-full sm:min-w-[340px] max-w-sm bg-white dark:bg-neutral-800 top-full mt-3 py-5 sm:py-6 px-4 sm:px-8 rounded-3xl shadow-xl" style={{ maxHeight: '40vh', overflowY: 'auto' }}>
+              <div className="mb-4">
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  value={searchTerm}
+                  onChange={handleSearchChange}
+                  className="w-full p-2 border border-neutral-300 rounded-md"
+                />
+              </div>
+
+              <div className="mb-4">
+                <Checkbox
+                  name="All"
+                  label="All"
+                  defaultChecked={typeOfProperty.every(item => item.checked)}
+                  onChange={(e) => {
+                    const newState = typeOfProperty.map(item => ({ ...item, checked: e }));
+                    setTypeOfProperty(newState);
+                    onChange && onChange(newState);
+                  }}
+                />
+              </div>
+
               <div className="">
                 <div className="relative flex flex-col space-y-5">
-                  {typeOfProperty.map((item, index) => (
+                  {filteredProperties.map((item, index) => (
                     <div key={item.name} className="">
                       <Checkbox
                         name={item.name}

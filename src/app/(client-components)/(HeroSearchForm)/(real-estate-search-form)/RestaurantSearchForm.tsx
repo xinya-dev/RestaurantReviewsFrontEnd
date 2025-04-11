@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import ButtonSubmit from "../ButtonSubmit";
 import RestaurantType from "./RestaurantType";
 import DistanceRange from "./DistanceRange";
-
+import PropertyTypeSelect from "./PropertyTypeSelect";
 export interface RestaurantSearchFormProps {
   activeTab?: SearchTab;
   defaultSearchText?: string;
@@ -129,8 +129,10 @@ const RestaurantSearchForm: FC<RestaurantSearchFormProps> = ({
         />
       ) : null}
       
-      <div className="self-center border-r border-slate-200 dark:border-slate-700 h-8"></div>
-      
+      <div className="self-center border-r border-slate-200 dark:border-slate-700 h-8">
+            
+      </div>
+      <PropertyTypeSelect />
       <div className="flex-[1.3] flex items-center">
         <div className="flex-grow">
           <DistanceRange 
