@@ -216,7 +216,7 @@ const SectionGridHasMap: FC<SectionGridHasMapProps> = () => {
               subHeading={filtersVisible ? getSearchContent() : null} 
               className="!mb-8" 
             />
-            <button onClick={toggleFilters} className={`ml-4 text-blue-600 ${filtersVisible ? "mt-[-32%] w-[250px]": "mt-[-8.5%] w-[250px]"}`}>
+            <button onClick={toggleFilters} className={`ml-4 text-blue-600 `}>
               {filtersVisible ? "- Minimise filters" : "+ Show Filters"}
             </button>
           </div>
