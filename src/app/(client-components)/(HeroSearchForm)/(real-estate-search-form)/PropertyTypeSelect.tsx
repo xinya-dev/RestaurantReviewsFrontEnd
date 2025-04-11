@@ -148,7 +148,7 @@ const PropertyTypeSelect: FC<PropertyTypeSelectProps> = ({
                 </span>
               </span>
               <span className="block mt-1 text-sm text-neutral-400 leading-none font-light ">
-                Select Property Type
+                Select Restaurant Type
               </span>
             </div>
           </Popover.Button>
