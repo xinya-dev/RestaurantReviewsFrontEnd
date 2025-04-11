@@ -195,23 +195,36 @@ const SectionGridHasMap: FC<SectionGridHasMapProps> = () => {
     );
   };
 
+  const [filtersVisible, setFiltersVisible] = useState(true);
+
+  const toggleFilters = () => {
+    setFiltersVisible(!filtersVisible);
+  };
+
   return (
     <div className="SectionGridHasMap" id="restaurant-results">
       <div className="relative flex min-h-screen">
         {/* CARDSSSS */}
         <div className="min-h-screen w-full xl:w-[60%] 2xl:w-[60%] max-w-[1184px] flex-shrink-0 xl:px-8 ">
-          <Heading2 
-            heading={
-              <span className="text-3xl md:text-4xl font-bold text-neutral-900 dark:text-white">
-                Restaurants in Australia
-              </span>
-            }
-            subHeading={getSearchContent()} 
-            className="!mb-8" 
-          />
-          <div className="mb-8 lg:mb-11">
-            <TabFilters />
+          <div className="flex justify-between items-center mb-4">
+            <Heading2 
+              heading={
+                <span className="text-3xl md:text-4xl font-bold text-neutral-900 dark:text-white">
+                  Restaurants in Australia
+                </span>
+              }
+              subHeading={filtersVisible ? getSearchContent() : null} 
+              className="!mb-8" 
+            />
+            <button onClick={toggleFilters} className={`ml-4 text-blue-600 ${filtersVisible ? "mt-[-33%] w-[250px]": "mt-[-10%] w-[250px]"}`}>
+              {filtersVisible ? "- Minimise filters" : "+ Show Filters"}
+            </button>
           </div>
+          {filtersVisible && (
+            <div className="mb-8 lg:mb-11">
+              <TabFilters />
+            </div>
+          )}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-5 2xl:gap-x-6 gap-y-8">
             {DEMO_STAYS.map((item) => (
               <div
