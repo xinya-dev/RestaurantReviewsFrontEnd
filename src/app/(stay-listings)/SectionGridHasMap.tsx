@@ -21,28 +21,28 @@ const triggerDropdownOpen = (type: 'filter' | 'distance') => {
 };
 
 const DEMO_STAYS = DEMO_STAY_LISTINGS.filter((_, i) => i < 12);
-export interface SectionGridHasMapProps {}
+export interface SectionGridHasMapProps { }
 
 const SectionGridHasMap: FC<SectionGridHasMapProps> = () => {
   const [currentHoverID, setCurrentHoverID] = useState<string | number>(-1);
   const [showFullMapFixed, setShowFullMapFixed] = useState(false);
   const router = useRouter();
-  
+
   // Get search parameters from URL
   const searchParams = useSearchParams();
   const query = searchParams.get('query') || '';
   const distance = searchParams.get('distance') || '0-10';
   const category = searchParams.get('category') || '';
   const filters = searchParams.get('filters') || '';
-  
+
   // Process filters
   const filterItems = filters ? filters.split(',') : [];
-  
+
   // Handle clicking on filter pills - scroll to top and open dropdown
   const handleFilterPillClick = (type: 'filter' | 'distance') => {
     // Find the search form element
     const searchFormElement = document.getElementById('search-form');
-    
+
     // If element found, scroll to it
     if (searchFormElement) {
       searchFormElement.scrollIntoView({ behavior: 'smooth' });
@@ -53,51 +53,51 @@ const SectionGridHasMap: FC<SectionGridHasMapProps> = () => {
         behavior: 'smooth'
       });
     }
-    
+
     // Wait for scroll to complete before triggering the dropdown
     setTimeout(() => {
       triggerDropdownOpen(type);
     }, 800);
   };
-  
+
   // Handle removing a filter
   const handleRemoveFilter = (filterToRemove: string, e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent triggering the parent onClick
-    
+
     // Create a new URLSearchParams object to construct the new URL
     const newParams = new URLSearchParams(searchParams.toString());
-    
+
     // Remove the selected filter from the filters
     const newFilters = filterItems.filter(item => item !== filterToRemove);
-    
+
     if (newFilters.length > 0) {
       newParams.set('filters', newFilters.join(','));
     } else {
       newParams.delete('filters');
     }
-    
+
     // Use router to navigate without page refresh
     router.push(`/listing-stay-map?${newParams.toString()}`);
   };
-  
+
   // Handle removing distance filter
   const handleRemoveDistance = (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent triggering the parent onClick
-    
+
     // Create a new URLSearchParams object to construct the new URL
     const newParams = new URLSearchParams(searchParams.toString());
-    
+
     // Remove the distance parameter
     newParams.delete('distance');
-    
+
     // Use router to navigate without page refresh
     router.push(`/listing-stay-map?${newParams.toString()}`);
   };
-  
+
   // Format category label
   const getCategoryLabel = () => {
     if (!category) return 'All Categories';
-    
+
     // Map of special category formats or replacements
     const categoryMap: Record<string, string> = {
       'Fast+Food': 'FAST FOOD TYPES',
@@ -110,11 +110,11 @@ const SectionGridHasMap: FC<SectionGridHasMapProps> = () => {
       'Casual+Dining': 'CASUAL DINING',
       'Healthy+Foods': 'HEALTHY FOODS'
     };
-    
+
     // Check if we have a special mapping for this category
     const formattedCategory = categoryMap[category];
     if (formattedCategory) return formattedCategory;
-    
+
     // Otherwise, transform the category string by replacing '+' with space and capitalizing each word
     return category.split('+')
       .map(word => word.charAt(0).toUpperCase() + word.slice(1))
@@ -134,23 +134,28 @@ const SectionGridHasMap: FC<SectionGridHasMapProps> = () => {
             </span>
           </div>
         )}
-        
+
         {filterItems.length > 0 && (
           <div className="flex items-start mb-3">
             <AdjustmentsHorizontalIcon className="h-5 w-5 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
             <div>
-              <span className="block text-neutral-500 dark:text-neutral-400 mb-2">
-                filtered with <span className="font-medium text-neutral-700 dark:text-neutral-200">{getCategoryLabel()}</span>:
+              <span className="text-neutral-500 dark:text-neutral-400 mb-2 flex items-center justify-between">
+                 <span className="font-medium text-neutral-700 dark:text-neutral-200">filtered with : {getCategoryLabel()}</span>
+                <span className="text-blue-600">
+                  <button onClick={toggleFilters} className="text-red-900">
+                    {filtersVisible ? "- Minimise filters" : ""}
+                  </button>
+                </span>
               </span>
               <div className="flex flex-wrap gap-2 mt-1">
                 {filterItems.map((item) => (
-                  <span 
+                  <span
                     key={item}
                     className="inline-flex items-center px-3 py-1.5 rounded-full text-sm bg-blue-100 text-blue-600 border border-blue-200 hover:bg-blue-50 cursor-pointer"
                     onClick={() => handleFilterPillClick('filter')}
                   >
                     {item}
-                    <button 
+                    <button
                       className="ml-1.5 text-blue-500 hover:text-blue-700 focus:outline-none"
                       onClick={(e) => handleRemoveFilter(item, e)}
                       aria-label={`Remove ${item} filter`}
@@ -165,7 +170,7 @@ const SectionGridHasMap: FC<SectionGridHasMapProps> = () => {
             </div>
           </div>
         )}
-        
+
         <div className="flex items-start">
           <MapPinIcon className="h-5 w-5 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
           <div>
@@ -173,12 +178,12 @@ const SectionGridHasMap: FC<SectionGridHasMapProps> = () => {
               Distance:
             </span>
             <div className="flex flex-wrap gap-2 mt-1">
-              <span 
+              <span
                 className="inline-flex items-center px-3 py-1.5 rounded-full text-sm bg-blue-100 text-blue-600 border border-blue-200 hover:bg-blue-50 cursor-pointer"
                 onClick={() => handleFilterPillClick('distance')}
               >
                 {distance} Kms
-                <button 
+                <button
                   className="ml-1.5 text-blue-500 hover:text-blue-700 focus:outline-none"
                   onClick={(e) => handleRemoveDistance(e)}
                   aria-label="Remove distance filter"
@@ -207,17 +212,17 @@ const SectionGridHasMap: FC<SectionGridHasMapProps> = () => {
         {/* CARDSSSS */}
         <div className="min-h-screen w-full xl:w-[60%] 2xl:w-[60%] max-w-[1184px] flex-shrink-0 xl:px-8 ">
           <div className="flex justify-between items-center mb-4">
-            <Heading2 
+            <Heading2
               heading={
                 <span className="text-3xl md:text-4xl font-bold text-neutral-900 dark:text-white">
                   Restaurants in Australia
                 </span>
               }
-              subHeading={filtersVisible ? getSearchContent() : null} 
-              className="!mb-8" 
+              subHeading={filtersVisible ? getSearchContent() : null}
+              className="!mb-8"
             />
             <button onClick={toggleFilters} className={`ml-4 text-blue-600 `}>
-              {filtersVisible ? "- Minimise filters" : "+ Show Filters"}
+              {filtersVisible ? "" : "+ Show Filters"}
             </button>
           </div>
           {filtersVisible && (
@@ -253,9 +258,8 @@ const SectionGridHasMap: FC<SectionGridHasMapProps> = () => {
 
         {/* MAPPPPP */}
         <div
-          className={`xl:flex-1 xl:static xl:block ${
-            showFullMapFixed ? "fixed inset-0 z-50" : "hidden"
-          }`}
+          className={`xl:flex-1 xl:static xl:block ${showFullMapFixed ? "fixed inset-0 z-50" : "hidden"
+            }`}
         >
           {showFullMapFixed && (
             <ButtonClose
