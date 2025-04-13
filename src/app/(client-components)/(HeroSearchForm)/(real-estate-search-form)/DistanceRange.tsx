@@ -23,7 +23,10 @@ const DistanceRange: FC<DistanceRangeProps> = ({
   defaultSearchDistance,
 }) => {
   const popoverButtonRef = useRef<HTMLButtonElement>(null);
-  const [dropdownPosition, setDropdownPosition] = useState<'top' | 'bottom'>('bottom');
+  const [dropdownPosition, setDropdownPosition] = useState<{
+    vertical: 'top' | 'bottom';
+    horizontal: 'left' | 'right';
+  }>({ vertical: 'bottom', horizontal: 'left' });
   
   // Listen for the custom dropdown event
   useEffect(() => {
@@ -47,21 +50,28 @@ const DistanceRange: FC<DistanceRangeProps> = ({
     };
   }, []);
 
-  // Add effect to check if dropdown would go out of view
+  // Update effect to check both vertical and horizontal positioning
   useEffect(() => {
     const updatePosition = () => {
       if (popoverButtonRef.current) {
         const buttonRect = popoverButtonRef.current.getBoundingClientRect();
         const windowHeight = window.innerHeight;
+        const windowWidth = window.innerWidth;
+        const dropdownHeight = 240; // Height of the dropdown
+        const dropdownWidth = 340; // Min width of the dropdown
+        
+        // Check vertical position
         const spaceBelow = windowHeight - buttonRect.bottom;
         const spaceAbove = buttonRect.top;
-        const dropdownHeight = 350; // Approximate height of the dropdown
         
-        if (spaceBelow < dropdownHeight && spaceAbove > spaceBelow) {
-          setDropdownPosition('top');
-        } else {
-          setDropdownPosition('bottom');
-        }
+        // Check horizontal position
+        const spaceRight = windowWidth - buttonRect.right;
+        const spaceLeft = buttonRect.left;
+
+        setDropdownPosition({
+          vertical: spaceBelow < dropdownHeight && spaceAbove > spaceBelow ? 'top' : 'bottom',
+          horizontal: spaceRight < dropdownWidth && spaceLeft > spaceRight ? 'left' : 'right'
+        });
       }
     };
 
@@ -177,13 +187,18 @@ const DistanceRange: FC<DistanceRangeProps> = ({
             leaveFrom="opacity-100 translate-y-0"
             leaveTo="opacity-0 translate-y-1"
           >
-            <Popover.Panel className={`absolute left-0 lg:right-0 z-10 w-full sm:min-w-[340px] max-w-sm bg-white dark:bg-neutral-800 ${
-              dropdownPosition === 'top' 
-                ? 'bottom-full mb-3' 
-                : 'top-full mt-3'
-            } py-5 sm:py-6 px-4 sm:px-8 rounded-3xl shadow-xl`}>
+            <Popover.Panel 
+              className={`absolute z-50 w-full sm:min-w-[340px] max-w-sm bg-white dark:bg-neutral-800 
+                ${dropdownPosition.vertical === 'top' 
+                  ? 'bottom-[calc(100%+1.5rem)]' 
+                  : 'top-[calc(100%+1.5rem)]'}
+                ${dropdownPosition.horizontal === 'left'
+                  ? 'left-0'
+                  : 'right-0'}
+                py-5 sm:py-6 px-4 sm:px-8 rounded-3xl shadow-xl h-[240px]`}
+            >
               <div className="relative flex flex-col space-y-8">
-                <div className="space-y-5">
+                <div className="">
                   <span className="font-medium">Distance Range</span>
                   <Slider
                     range

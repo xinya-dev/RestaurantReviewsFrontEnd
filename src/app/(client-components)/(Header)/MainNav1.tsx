@@ -8,12 +8,30 @@ import SwitchDarkMode from "@/shared/SwitchDarkMode";
 import HeroSearchForm2MobileFactory from "../(HeroSearchForm2Mobile)/HeroSearchForm2MobileFactory";
 import LangDropdown from "./LangDropdown";
 import Link from "next/link";
+import { useAuth } from "@/hooks/useAuth";
+import NotifyDropdown from "./NotifyDropdown";
+import Avatar from "@/shared/Avatar";
+import { useRouter } from "next/navigation";
+import AvatarDropdown from "./AvatarDropdown";
 
 export interface MainNav1Props {
   className?: string;
 }
 
 const MainNav1: FC<MainNav1Props> = ({ className = "" }) => {
+  const { isAuthenticated, user, logout, authState } = useAuth();
+  const router = useRouter();
+
+  const handleLogout = () => {
+    logout();
+    router.push('/');
+  };
+
+  // This will force a re-render when authState changes
+  React.useEffect(() => {
+    // This effect will run whenever authState changes
+  }, [authState]);
+
   return (
     <div className={`nc-MainNav1 relative z-10 ${className}`}>
       <div className="px-4 lg:container h-20 relative flex justify-between">
@@ -39,9 +57,24 @@ const MainNav1: FC<MainNav1Props> = ({ className = "" }) => {
             <SwitchDarkMode />
             <SearchDropdown className="flex items-center" />
             <div className="px-1" />
-            <ButtonPrimary className="self-center" href="/login">
-              Sign up / Sign in
-            </ButtonPrimary>
+            
+            {isAuthenticated ? (
+              <>
+                <NotifyDropdown className="flex items-center" />
+                <div className="px-1" />
+                <div className="flex items-center space-x-2">
+                  <AvatarDropdown
+                    imgUrl={user?.profile_picture}
+                    userName={user?.username}
+                    sizeClass="w-8 h-8"
+                  />
+                </div>
+              </>
+            ) : (
+              <ButtonPrimary className="self-center" href="/login">
+                Sign up / Sign in
+              </ButtonPrimary>
+            )}
           </div>
 
           <div className="flex xl:hidden items-center">

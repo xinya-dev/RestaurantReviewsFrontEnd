@@ -1,4 +1,5 @@
-import React, { FC } from "react";
+"use client";
+import React, { FC, useState } from "react";
 import facebookSvg from "@/images/Facebook.svg";
 import twitterSvg from "@/images/Twitter.svg";
 import googleSvg from "@/images/Google.svg";
@@ -6,8 +7,12 @@ import Input from "@/shared/Input";
 import ButtonPrimary from "@/shared/ButtonPrimary";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import Alert from "@/shared/Alert";
 
-export interface PageLoginProps {}
+interface PageLoginProps {
+  className?: string;
+}
 
 const loginSocials = [
   {
@@ -27,9 +32,87 @@ const loginSocials = [
   },
 ];
 
-const PageLogin: FC<PageLoginProps> = ({}) => {
+interface AlertState {
+  type: 'success' | 'error';
+  message: string;
+  show: boolean;
+}
+
+const PageLogin: FC<PageLoginProps> = ({ className = "" }) => {
+  const router = useRouter();
+  const [formData, setFormData] = useState({
+    email_or_username: '',
+    password: '',
+  });
+  const [loading, setLoading] = useState(false);
+  const [alert, setAlert] = useState<AlertState>({
+    type: 'success',
+    message: '',
+    show: false
+  });
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setAlert({ type: 'success', message: '', show: false });
+
+    try {
+      const response = await fetch('http://35.92.149.12:8000/api/auth/login/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Store tokens and user data
+        localStorage.setItem('access_token', data.access_token);
+        localStorage.setItem('refresh_token', data.refresh_token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+
+        // Dispatch auth state change event
+        window.dispatchEvent(new Event('authStateChange'));
+
+        setAlert({
+          type: 'success',
+          message: 'Login successful!',
+          show: true
+        });
+
+        // Redirect to home page
+        router.push('/');
+      } else {
+        setAlert({
+          type: 'error',
+          message: data.detail || 'Login failed. Please try again.',
+          show: true
+        });
+      }
+    } catch (error) {
+      setAlert({
+        type: 'error',
+        message: 'An error occurred. Please try again.',
+        show: true
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className={`nc-PageLogin`}>
+    <div className={`nc-PageLogin ${className}`} data-nc-id="PageLogin">
       <div className="container mb-24 lg:mb-32">
         <h2 className="my-20 flex items-center text-3xl leading-[115%] md:text-5xl md:leading-[115%] font-semibold text-neutral-900 dark:text-neutral-100 justify-center">
           Login
@@ -61,15 +144,27 @@ const PageLogin: FC<PageLoginProps> = ({}) => {
             <div className="absolute left-0 w-full top-1/2 transform -translate-y-1/2 border border-neutral-100 dark:border-neutral-800"></div>
           </div>
           {/* FORM */}
-          <form className="grid grid-cols-1 gap-6" action="#" method="post">
+          <form className="grid grid-cols-1 gap-6" onSubmit={handleSubmit}>
+            {alert.show && (
+              <Alert
+                type={alert.type}
+                message={alert.message}
+                show={alert.show}
+                onClose={() => setAlert({ ...alert, show: false })}
+              />
+            )}
             <label className="block">
               <span className="text-neutral-800 dark:text-neutral-200">
-                Email address
+                Email or Username
               </span>
               <Input
-                type="email"
-                placeholder="example@example.com"
+                type="text"
+                name="email_or_username"
+                value={formData.email_or_username}
+                onChange={handleChange}
+                placeholder="Enter your email or username"
                 className="mt-1"
+                required
               />
             </label>
             <label className="block">
@@ -79,15 +174,27 @@ const PageLogin: FC<PageLoginProps> = ({}) => {
                   Forgot password?
                 </Link>
               </span>
-              <Input type="password" className="mt-1" />
+              <Input
+                type="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                className="mt-1"
+                required
+              />
             </label>
-            <ButtonPrimary type="submit">Continue</ButtonPrimary>
+            <ButtonPrimary type="submit" disabled={loading}>
+              {loading ? "Logging in..." : "Continue"}
+            </ButtonPrimary>
           </form>
 
           {/* ==== */}
           <span className="block text-center text-neutral-700 dark:text-neutral-300">
             New user? {` `}
-            <Link href="/signup" className="font-semibold underline">
+            <Link
+              href="/signup"
+              className="text-neutral-6000 hover:text-black dark:text-neutral-300 dark:hover:text-white"
+            >
               Create an account
             </Link>
           </span>

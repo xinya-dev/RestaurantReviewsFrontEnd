@@ -63,7 +63,7 @@ const Layout = ({ children, params }: LayoutProps) => {
 
   return (
     <div className={`nc-ListingStayPage relative `}>
-      <BgGlassmorphism />
+      <BgGlassmorphism className="absolute inset-x-0 md:top- xl:top- min-h-170 max-h-200 pl-20 py-24 flex overflow-hidden z-0 h-180" image="/images/banner1.jpg" spanClassName="hidden"/>
 
       {/* SECTION HERO */}
       <div className="container pt-10 pb-24 lg:pt-16 lg:pb-28 mt-5">

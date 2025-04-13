@@ -5,7 +5,7 @@ import { PathName } from "@/routers/types";
 const NAVIGATION_ITEMS = [
   { id: "post-review", name: "Post a Review or Photo", href: "/post-review" as PathName },
   { id: "services", name: "Our Services", href: "/services" as PathName },
-  { id: "support-contact", name: "Support/ Contact", href: "/contact" as PathName },
+  { id: "support-contact", name: "Support / Contact", href: "/contact" as PathName },
 ];
 
 function Navigation() {

@@ -8,7 +8,7 @@ import { SearchTab } from "../RRSearchForm";
 import Image from "next/image";
 
 interface CuisineType {
-  name: string;
+  name: CuisineName;
   description: string;
   checked: boolean;
   flag?: string;
@@ -35,12 +35,56 @@ export interface PropertyTypeSelectProps {
   initialValue?: string[];
 }
 
+// Add type for cuisine names
+type CuisineName = 
+  | "All"
+  | "Australian"
+  | "Italian"
+  | "Thai"
+  | "Indian"
+  | "Chinese"
+  | "Greek"
+  | "American"
+  | "English"
+  | "Japanese"
+  | "Vietnamese"
+  | "Mexican"
+  | "French"
+  | "Spanish"
+  | "Indonesian"
+  | "Philippines"
+  | "Middle Eastern"
+  | "Singapore"
+  | "Arab";
+
+const cuisineImages: Record<CuisineName, string> = {
+  All: "/images/cuisines/All.jpeg",
+  Australian: "/images/cuisines/Australian.jpg",
+  Italian: "/images/cuisines/Italy.jpeg",
+  Thai: "/images/cuisines/Thai.jpg",
+  Indian: "/images/cuisines/India.jpg",
+  Chinese: "/images/cuisines/Chinese.png",
+  Greek: "/images/cuisines/All.jpeg",
+  American: "/images/cuisines/United States.jpg",
+  English: "/images/cuisines/United Kingdom.jpg",
+  Japanese: "/images/cuisines/Japan.jpg",
+  Vietnamese: "/images/cuisines/Vietnam.jpg",
+  Mexican: "/images/cuisines/Mexico.jpg",
+  French: "/images/cuisines/France.jpg",
+  Spanish: "/images/cuisines/Spanish.jpg",
+  Indonesian: "/images/cuisines/Indonesia.jpg",
+  Philippines: "/images/cuisines/Philippines.jpg",
+  "Middle Eastern": "/images/cuisines/Middle East.jpg",
+  Singapore: "/images/cuisines/Singapore.jpg",
+  Arab: "/images/cuisines/Middle East.jpg"
+};
+
 const cuisineTypes: CuisineType[] = [
   {
     name: "All",
     description: "All International Cuisines",
     checked: true,
-    flag: "all"
+    flag: "un"  // United Nations flag represents global/international
   },
   {
     name: "Australian",
@@ -139,7 +183,7 @@ const cuisineTypes: CuisineType[] = [
     flag: "ae"
   },
   {
-    name: "Singaporean",
+    name: "Singapore",
     description: "Singapore's diverse cuisine",
     checked: true,
     flag: "sg"
@@ -240,7 +284,7 @@ const PropertyTypeSelect: FC<PropertyTypeSelectProps> = ({
   onSelectionChange
 }) => {
   if (DEBUG) console.log("[PropertyTypeSelect] Rendering with initialValue:", initialValue);
-  
+
   const getDefaultOptions = () => {
     switch (activeTab) {
       case "International Cuisine":
@@ -257,7 +301,7 @@ const PropertyTypeSelect: FC<PropertyTypeSelectProps> = ({
   const [typeOfProperty, setTypeOfProperty] = React.useState(() => {
     // Get the default options based on active tab
     const options = getDefaultOptions();
-    
+
     // For homepage (no initialValue), all options should be checked
     if (!initialValue || initialValue.length === 0) {
       return options.map(option => ({
@@ -265,7 +309,7 @@ const PropertyTypeSelect: FC<PropertyTypeSelectProps> = ({
         checked: true // Ensure all are checked on homepage
       }));
     }
-    
+
     // For filtered view, only options in initialValue should be checked
     const allChecked = options.slice(1).every(option => initialValue.includes(option.name));
     return options.map(option => ({
@@ -273,26 +317,29 @@ const PropertyTypeSelect: FC<PropertyTypeSelectProps> = ({
       checked: option.name === "All" ? allChecked : initialValue.includes(option.name)
     }));
   });
-  
-  const [dropdownPosition, setDropdownPosition] = React.useState<'top' | 'bottom'>('bottom');
+
+  const [dropdownPosition, setDropdownPosition] = React.useState<{
+    horizontal: 'left' | 'center' | 'right';
+    vertical: 'top' | 'bottom';
+  }>({ horizontal: 'center', vertical: 'bottom' });
   const buttonRef = React.useRef<HTMLButtonElement>(null);
-  
+
   // Listen for the custom dropdown event
   useEffect(() => {
     const handleOpenSearchDropdown = (event: Event) => {
       // Check if the event is our custom event and type is 'filter'
-      if (event instanceof CustomEvent && 
-          event.detail && 
-          event.detail.type === 'filter' && 
-          buttonRef.current) {
+      if (event instanceof CustomEvent &&
+        event.detail &&
+        event.detail.type === 'filter' &&
+        buttonRef.current) {
         // Click the button to open the dropdown
         buttonRef.current.click();
       }
     };
-    
+
     // Add event listener
     window.addEventListener('openSearchDropdown', handleOpenSearchDropdown);
-    
+
     // Clean up
     return () => {
       window.removeEventListener('openSearchDropdown', handleOpenSearchDropdown);
@@ -301,9 +348,9 @@ const PropertyTypeSelect: FC<PropertyTypeSelectProps> = ({
 
   useEffect(() => {
     if (DEBUG) console.log("[PropertyTypeSelect] activeTab changed:", activeTab);
-    
+
     const options = getDefaultOptions();
-    
+
     // For homepage (no initialValue), ensure all options are checked
     if (!initialValue || initialValue.length === 0) {
       if (DEBUG) console.log("[PropertyTypeSelect] Setting default checked state for homepage");
@@ -313,7 +360,7 @@ const PropertyTypeSelect: FC<PropertyTypeSelectProps> = ({
       })));
       return;
     }
-    
+
     // For filtered view, only options in initialValue should be checked
     if (DEBUG) console.log("[PropertyTypeSelect] Setting filtered checked state based on:", initialValue);
     const allChecked = options.slice(1).every(option => initialValue.includes(option.name));
@@ -327,12 +374,12 @@ const PropertyTypeSelect: FC<PropertyTypeSelectProps> = ({
   // Only handle explicit changes to initialValue from props, separate from internal checkbox state
   useEffect(() => {
     if (DEBUG) console.log("[PropertyTypeSelect] initialValue changed:", initialValue);
-    
+
     // Skip this effect on initial render to avoid conflicts with the default state
     if (!prevTypeOfPropertyRef.current) {
       return;
     }
-    
+
     if (initialValue && initialValue.length > 0) {
       if (DEBUG) console.log("[PropertyTypeSelect] Updating checkboxes based on new initialValue");
       const options = getDefaultOptions();
@@ -348,7 +395,7 @@ const PropertyTypeSelect: FC<PropertyTypeSelectProps> = ({
   const handleCheckboxChange = (index: number, checked: boolean) => {
     // Create a new copy of the state
     let newState = [...typeOfProperty];
-    
+
     if (index === 0) {
       // If "All" checkbox is clicked, update all checkboxes to match
       newState = newState.map(item => ({
@@ -361,23 +408,23 @@ const PropertyTypeSelect: FC<PropertyTypeSelectProps> = ({
         ...newState[index],
         checked: checked
       };
-      
+
       // Update "All" checkbox based on whether all individual items are checked
       // The "All" checkbox should only be checked if ALL other checkboxes are checked
       const allIndividualItemsChecked = newState.slice(1).every(item => item.checked);
-      
+
       newState[0] = {
         ...newState[0],
         checked: allIndividualItemsChecked
       };
     }
-    
+
     // Create a completely new array to ensure React detects the change
     const finalState = [...newState];
-    
+
     // Update the state with the new array
     setTypeOfProperty(finalState);
-    
+
     // Call external onChange handler
     if (onChange) {
       // Make sure we pass a new array reference
@@ -430,59 +477,80 @@ const PropertyTypeSelect: FC<PropertyTypeSelectProps> = ({
 
   const Icon = getIcon();
 
+  // Update dropdown position based on button position
   React.useEffect(() => {
     const updatePosition = () => {
       if (buttonRef.current) {
         const buttonRect = buttonRef.current.getBoundingClientRect();
+        const windowWidth = window.innerWidth;
         const windowHeight = window.innerHeight;
+        const dropdownWidth = 1100; // Width of the dropdown
+        const dropdownHeight = 400; // Approximate height of the dropdown
+        const halfDropdownWidth = dropdownWidth / 2;
+        
+        // Calculate horizontal position
+        const buttonCenter = buttonRect.left + (buttonRect.width / 2);
+        const leftIfCentered = buttonCenter - halfDropdownWidth;
+        const rightIfCentered = buttonCenter + halfDropdownWidth;
+
+        // Calculate vertical space
         const spaceBelow = windowHeight - buttonRect.bottom;
         const spaceAbove = buttonRect.top;
-        
-        if (spaceBelow < 300 && spaceAbove > spaceBelow) {
-          setDropdownPosition('top');
-        } else {
-          setDropdownPosition('bottom');
-        }
+
+        // Set horizontal position
+        const horizontal = leftIfCentered < 20 
+          ? 'left' 
+          : rightIfCentered > windowWidth - 20 
+            ? 'right' 
+            : 'center';
+
+        // Set vertical position
+        const vertical = spaceBelow < dropdownHeight && spaceAbove > spaceBelow 
+          ? 'top' 
+          : 'bottom';
+
+        setDropdownPosition({ horizontal, vertical });
       }
     };
 
-    window.addEventListener('scroll', updatePosition);
-    window.addEventListener('resize', updatePosition);
+    // Update position on mount and window resize
     updatePosition();
-
+    window.addEventListener('resize', updatePosition);
+    window.addEventListener('scroll', updatePosition);
+    
     return () => {
-      window.removeEventListener('scroll', updatePosition);
       window.removeEventListener('resize', updatePosition);
+      window.removeEventListener('scroll', updatePosition);
     };
   }, []);
 
   // Use useRef to track the previous state of typeOfProperty
   const prevTypeOfPropertyRef = React.useRef<typeof typeOfProperty | null>(null);
-  
+
   useEffect(() => {
     // Only call onSelectionChange if there's an actual change in selected items
     if (typeOfProperty && typeOfProperty.length > 0 && onSelectionChange) {
       const selectedItems = typeOfProperty
         .filter(item => item.checked && item.name !== "All")
         .map(item => item.name);
-      
+
       // Get the previous selected items
       const prevSelectedItems = prevTypeOfPropertyRef.current
         ? prevTypeOfPropertyRef.current
-            .filter(item => item.checked && item.name !== "All")
-            .map(item => item.name)
+          .filter(item => item.checked && item.name !== "All")
+          .map(item => item.name)
         : [];
-      
+
       // Check if the selected items have actually changed
-      const hasChanged = 
+      const hasChanged =
         prevSelectedItems.length !== selectedItems.length ||
         selectedItems.some((item, i) => item !== prevSelectedItems[i]);
-      
+
       // Only call onSelectionChange if there's a change
       if (hasChanged) {
         onSelectionChange(selectedItems);
       }
-      
+
       // Update the ref to the current state
       prevTypeOfPropertyRef.current = [...typeOfProperty];
     }
@@ -494,8 +562,7 @@ const PropertyTypeSelect: FC<PropertyTypeSelectProps> = ({
         <>
           <Popover.Button
             ref={buttonRef}
-            className={`flex z-10 text-left w-full flex-shrink-0 items-center ${fieldClassName} space-x-3 focus:outline-none cursor-pointer ${
-              open ? "nc-hero-field-focused" : ""
+            className={`flex z-10 text-left w-full flex-shrink-0 items-center ${fieldClassName} space-x-3 focus:outline-none cursor-pointer ${open ? "nc-hero-field-focused" : ""
               }`}
           >
             <div className="text-neutral-300 dark:text-neutral-400">
@@ -526,89 +593,140 @@ const PropertyTypeSelect: FC<PropertyTypeSelectProps> = ({
             leaveFrom="opacity-100 translate-y-0"
             leaveTo="opacity-0 translate-y-1"
           >
-            <Popover.Panel 
-              className={`absolute left-0 z-10 w-full sm:min-w-[340px] max-w-sm bg-white dark:bg-neutral-800 ${
-                dropdownPosition === 'top' 
-                  ? 'bottom-full mb-3' 
-                  : 'top-full mt-3'
-              } py-4 sm:py-5 px-4 sm:px-8 rounded-3xl shadow-xl`}
-              style={{ 
-                maxHeight: '49vh',
-                overflowY: 'auto',
-                scrollbarWidth: 'thin',
-                scrollbarColor: '#9333ea transparent'
-              }}
+            <Popover.Panel
+              static
+              className={`will-change-transform sub-menu absolute transform z-10 w-[1100px] px-2 sm:px-0 ${
+                dropdownPosition.vertical === 'top'
+                  ? 'bottom-[calc(100%+1rem)]'
+                  : 'top-[calc(100%+1rem)]'
+              } ${
+                dropdownPosition.horizontal === 'left'
+                  ? 'left-0'
+                  : dropdownPosition.horizontal === 'right'
+                  ? 'right-0'
+                  : 'left-1/2 -translate-x-1/2'
+              }`}
             >
-              <style jsx global>{`
-                .cuisine-dropdown::-webkit-scrollbar {
-                  width: 6px;
-                }
-                .cuisine-dropdown::-webkit-scrollbar-track {
-                  background: transparent;
-                }
-                .cuisine-dropdown::-webkit-scrollbar-thumb {
-                  background-color: #9333ea;
-                  border-radius: 20px;
-                  border: 2px solid transparent;
-                }
-                .cuisine-dropdown {
-                  scrollbar-width: thin;
-                  scrollbar-color: #9333ea transparent;
-                }
-              `}</style>
-              <div className="cuisine-dropdown">
-                <div className="relative flex flex-col space-y-4">
-                  {typeOfProperty.map((item, index) => {
-                    const isAllOption = index === 0;
-                    return (
-                      <div key={item.name} className="flex items-center space-x-3">
-                        <div className="flex-none">
-                          <input
-                            id={`${activeTab}-${item.name}`}
-                            name={`${activeTab}-${item.name}`}
-                            type="checkbox"
-                            className="focus:ring-action-primary h-6 w-6 text-primary-500 border-primary rounded border-neutral-500 bg-white dark:bg-neutral-700 dark:checked:bg-primary-500 focus:ring-primary-500"
-                            checked={item.checked}
-                            onChange={(e) => {
-                              // Prevent event bubbling and ensure clean handling
-                              e.stopPropagation();
+              <div className="overflow-hidden rounded-2xl shadow-lg ring-1 ring-black dark:ring-white ring-opacity-5 dark:ring-opacity-10">
+                <div className={`relative bg-white dark:bg-neutral-900 p-8`}>
+                  {activeTab === "International Cuisine" ? (
+                    // Grid view for cuisine types
+                    <div 
+                      className="grid grid-cols-8 gap-4 overflow-y-auto scrollbar-thin scrollbar-thumb-neutral-300 dark:scrollbar-thumb-neutral-700 scrollbar-track-transparent"
+                      style={{
+                        scrollbarWidth: 'thin',
+                        msOverflowStyle: 'none',
+                        gridAutoRows: 'min-content',
+                        maxHeight: '180px', // Height of one row plus some padding
+                      }}
+                    >
+                      {typeOfProperty.map((item, index) => {
+                        const cuisineItem = item as CuisineType;
+                        return (
+                          <div 
+                            key={item.name} 
+                            className={`group cursor-pointer  transition-all duration-300 relative ${
+                              item.checked ? 'ring-1 ring-primary-50' : ''
+                            }`}
+                            onClick={(e) => {
                               e.preventDefault();
-                              // Call handleCheckboxChange with the index and new checked state
+                              e.stopPropagation();
                               handleCheckboxChange(index, !item.checked);
                             }}
-                          />
-                        </div>
-                        {isCuisineType(item) && item.flag !== 'all' && (
-                          <div className="flex-none w-6">
-                            <Image
-                              src={`https://flagcdn.com/24x18/${item.flag}.png`}
-                              alt={`${item.name} flag`}
-                              width={24}
-                              height={18}
-                              className="rounded-sm"
-                      />
-                    </div>
-                        )}
-                        <div className="flex-1">
-                          <label
-                            htmlFor={`${activeTab}-${item.name}`}
-                            className="flex flex-col cursor-pointer"
-                            onClick={(e) => {
-                              // Prevent label click from interfering with checkbox
-                              e.stopPropagation();
-                            }}
                           >
-                            <span className="font-medium text-neutral-900 dark:text-neutral-100">
+                            {/* Checkbox indicator */}
+                            <div className={`absolute top-2 right-2 z-20 w-5 h-5 rounded-full border-2 ${
+                              item.checked 
+                                ? 'bg-primary-500 border-primary-500' 
+                                : 'bg-white border-neutral-300 dark:border-neutral-600'
+                            }`}>
+                              {item.checked && (
+                                <svg className="w-full h-full text-white" viewBox="0 0 24 24">
+                                  <path fill="currentColor" d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
+                                </svg>
+                              )}
+                            </div>
+                            
+                            <div className="aspect-w-3 aspect-h-2 overflow-hidden relative ">
+                              {/* Flag Image (shown by default) */}
+                              <div className="absolute inset-0 transition-transform duration-300 ease-in-out transform group-hover:scale-110 group-hover:opacity-0">
+                                <Image 
+                                  alt={`${cuisineItem.name} flag`}
+                                  src={`https://flagcdn.com/w320/${cuisineItem.flag}.png`}
+                                  fill
+                                  className="object-cover "
+                                  sizes="(max-width: 640px) 160px, 320px "
+                                  priority
+                                />
+                              </div>
+                              {/* Cuisine Image (shown on hover) */}
+                              <div className="absolute inset-0 transition-all duration-300 ease-in-out opacity-0 group-hover:opacity-100">
+                                <Image 
+                                  alt={`${cuisineItem.name} cuisine`}
+                                  src={cuisineImages[cuisineItem.name as CuisineName] || `/images/cuisines/default.jpg`}
+                                  fill
+                                  className="object-cover"
+                                  sizes="(max-width: 640px) 160px, 320px"
+                                />
+                                {/* Dark overlay for better text readability */}
+                                <div className="absolute inset-0 bg-black bg-opacity-5 transition-opacity duration-300"></div>
+                              </div>
+                            </div>
+                            <div className="relative mt-2 text-center h-12 flex flex-col items-center justify-center">
+                              {/* Name (shown by default) */}
+                              <h3 className="absolute w-full text-sm font-medium text-neutral-900 dark:text-neutral-200 transition-all duration-300 transform group-hover:-translate-y-2 group-hover:opacity-0 line-clamp-1">
+                                {item.name}
+                              </h3>
+                              {/* Description (shown on hover) */}
+                              <p className="absolute w-full text-xs text-neutral-500 dark:text-neutral-400 transition-all duration-300 transform translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 px-2 line-clamp-2">
+                                {item.description}
+                              </p>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    // List view for other types
+                    <div className="flex flex-col space-y-4 max-h-[320px] overflow-y-auto">
+                  {typeOfProperty.map((item, index) => (
+                        <div 
+                          key={item.name}
+                          className={`flex items-center space-x-3 p-3 rounded-lg cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-800 ${
+                            item.checked ? 'bg-neutral-100 dark:bg-neutral-800' : ''
+                          }`}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleCheckboxChange(index, !item.checked);
+                          }}
+                        >
+                          {/* Checkbox */}
+                          <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                            item.checked 
+                              ? 'bg-primary-500 border-primary-500' 
+                              : 'border-neutral-300 dark:border-neutral-600'
+                          }`}>
+                            {item.checked && (
+                              <svg className="w-3 h-3 text-white" viewBox="0 0 24 24">
+                                <path fill="currentColor" d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
+                              </svg>
+                            )}
+                          </div>
+                          
+                          {/* Content */}
+                          <div className="flex-1">
+                            <h3 className="text-base font-medium text-neutral-900 dark:text-neutral-200">
                               {item.name}
-                            </span>
-                            <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-1">
+                            </h3>
+                            <p className="text-sm text-neutral-500 dark:text-neutral-400">
                               {item.description}
                             </p>
-                          </label>
-                        </div>
-                      </div>
-                    );
-                  })}
+                          </div>
+                    </div>
+                  ))}
+                    </div>
+                  )}
                 </div>
               </div>
             </Popover.Panel>

@@ -67,7 +67,7 @@ const RRSearchBox: FC<LocationInputProps> = ({
         const windowHeight = window.innerHeight;
         const spaceBelow = windowHeight - containerRect.bottom;
         const spaceAbove = containerRect.top;
-        const dropdownHeight = 320; // Approximate max height of dropdown
+        const dropdownHeight = 280; // Reduced max height of dropdown
 
         if (spaceBelow < dropdownHeight && spaceAbove > spaceBelow) {
           setDropdownPosition('top');
@@ -226,11 +226,11 @@ const RRSearchBox: FC<LocationInputProps> = ({
       )}
 
       {showPopover && (
-        <div className={`absolute left-0 z-40 w-full min-w-[300px] sm:min-w-[500px] bg-white dark:bg-neutral-800 ${
+        <div className={`absolute left-0 z-40 w-full min-w-[300px] sm:min-w-[500px] bg-white dark:bg-neutral-800 h-[230px] ${
           dropdownPosition === 'top' 
             ? 'bottom-full mb-3' 
             : 'top-full mt-3'
-        } py-3 sm:py-6 rounded-3xl shadow-xl max-h-96 overflow-y-auto`}>
+        } py-2 sm:py-4 rounded-3xl shadow-xl max-h-[280px] overflow-y-auto scrollbar-thin scrollbar-thumb-neutral-300 dark:scrollbar-thumb-neutral-700 scrollbar-track-transparent`}>
           {value ? renderSearchValue() : renderRecentSearches()}
         </div>
       )}

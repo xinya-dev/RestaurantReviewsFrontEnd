@@ -26,10 +26,10 @@ const SectionHero: FC<SectionHeroProps> = ({ className = "" }) => {
           {/* Main Content Column - 75% - Hidden on mobile */}
           <div className="hidden md:block flex-1">
             <div className="flex-shrink-0 pb-14 lg:pb-8 xl:pr-14 lg:mr-10 xl:mr-0 text-center">
-              <h3 className="font-medium text-3xl md:text-4xl xl:text-4xl leading-none text-center text-neutral-900 dark:text-white">
+              <h3 className="font-medium text-3xl md:text-4xl xl:text-4xl leading-none text-center text-white dark:text-white">
               “View your meal before you order it”
               </h3>
-              <span className="block mt-4 text-lg md:text-xl text-neutral-600 dark:text-neutral-300">
+              <span className="block mt-4 text-lg md:text-xl text-white dark:text-neutral-300">
               Find your Favorite Food & Restaurants in your Area
 
               </span>

@@ -62,7 +62,7 @@ const SectionHeroArchivePage: FC<SectionHeroArchivePageProps> = ({
           />
         </div> */}
         <div className="hidden lg:flow-root w-full">
-          <div className="z-10 lg:-mt-40 xl:-mt-56 w-full">
+          <div className="z-10 lg:-mt-40 xl:-mt-70 w-full">
             <RRSearchForm 
               currentPage={currentPage} 
               currentTab={currentTab} 

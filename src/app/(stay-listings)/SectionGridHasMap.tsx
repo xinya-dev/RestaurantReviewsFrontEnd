@@ -11,10 +11,10 @@ import TabFilters from "./TabFilters";
 import Heading2 from "@/shared/Heading2";
 import StayCard2 from "@/components/StayCard2";
 import { useSearchParams, useRouter } from "next/navigation";
-import { MapPinIcon, MagnifyingGlassIcon, AdjustmentsHorizontalIcon } from "@heroicons/react/24/outline";
+import { MapPinIcon, MagnifyingGlassIcon, AdjustmentsHorizontalIcon, HomeIcon, GlobeAsiaAustraliaIcon } from "@heroicons/react/24/outline";
 
 // Global event for dropdown controls without URL params
-const triggerDropdownOpen = (type: 'filter' | 'distance') => {
+const triggerDropdownOpen = (type: 'filter' | 'distance' | 'property') => {
   // Create and dispatch a custom event
   const event = new CustomEvent('openSearchDropdown', { detail: { type } });
   window.dispatchEvent(event);
@@ -39,7 +39,7 @@ const SectionGridHasMap: FC<SectionGridHasMapProps> = () => {
   const filterItems = filters ? filters.split(',') : [];
 
   // Handle clicking on filter pills - scroll to top and open dropdown
-  const handleFilterPillClick = (type: 'filter' | 'distance') => {
+  const handleFilterPillClick = (type: 'filter' | 'distance' | 'property') => {
     // Find the search form element
     const searchFormElement = document.getElementById('search-form');
 
@@ -62,36 +62,25 @@ const SectionGridHasMap: FC<SectionGridHasMapProps> = () => {
 
   // Handle removing a filter
   const handleRemoveFilter = (filterToRemove: string, e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent triggering the parent onClick
-
-    // Create a new URLSearchParams object to construct the new URL
+    e.stopPropagation();
     const newParams = new URLSearchParams(searchParams.toString());
-
-    // Remove the selected filter from the filters
     const newFilters = filterItems.filter(item => item !== filterToRemove);
-
     if (newFilters.length > 0) {
       newParams.set('filters', newFilters.join(','));
     } else {
       newParams.delete('filters');
     }
-
-    // Use router to navigate without page refresh
-    router.push(`/listing-stay-map?${newParams.toString()}`);
+    const newPath = '/listing-stay-map?' + newParams.toString();
+    router.push(newPath as any);
   };
 
   // Handle removing distance filter
   const handleRemoveDistance = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent triggering the parent onClick
-
-    // Create a new URLSearchParams object to construct the new URL
+    e.stopPropagation();
     const newParams = new URLSearchParams(searchParams.toString());
-
-    // Remove the distance parameter
     newParams.delete('distance');
-
-    // Use router to navigate without page refresh
-    router.push(`/listing-stay-map?${newParams.toString()}`);
+    const newPath = '/listing-stay-map?' + newParams.toString();
+    router.push(newPath as any);
   };
 
   // Format category label
@@ -124,27 +113,40 @@ const SectionGridHasMap: FC<SectionGridHasMapProps> = () => {
 
   // Create subheading content
   const getSearchContent = () => {
+    const propertyTypes = searchParams.get('propertyTypes') || '';
+    const propertyTypeItems = propertyTypes ? propertyTypes.split(',') : [];
+
     return (
       <div className="mt-3 p-4 bg-neutral-50 dark:bg-neutral-800/50 rounded-xl border border-neutral-200 dark:border-neutral-700">
+        <div className="flex items-center justify-end">
+          <span className="text-blue-600">
+            <button onClick={toggleFilters} className="text-red-900">
+              {filtersVisible ? "- Minimise filters" : ""}
+            </button>
+          </span>
+        </div>
+        
         {query && (
           <div className="flex items-start mb-3">
             <MagnifyingGlassIcon className="h-5 w-5 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
-            <span className="block text-neutral-600 dark:text-neutral-300 font-medium text-base">
-              You are searching for "<span className="text-blue-600">{query}</span>"
-            </span>
+            <div>
+              <span className="block text-neutral-600 dark:text-neutral-300 font-medium text-base">
+                Search Term:
+              </span>
+              <span className="block mt-1 text-blue-600">
+                "{query}"
+              </span>
+            </div>
           </div>
         )}
 
         {filterItems.length > 0 && (
           <div className="flex items-start mb-3">
-            <AdjustmentsHorizontalIcon className="h-5 w-5 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
+            <GlobeAsiaAustraliaIcon className="h-5 w-5 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
             <div>
               <span className="text-neutral-500 dark:text-neutral-400 mb-2 flex items-center justify-between">
-                 <span className="font-medium text-neutral-700 dark:text-neutral-200">filtered with : {getCategoryLabel()}</span>
-                <span className="text-blue-600">
-                  <button onClick={toggleFilters} className="text-red-900">
-                    {filtersVisible ? "- Minimise filters" : ""}
-                  </button>
+                <span className="font-medium text-neutral-700 dark:text-neutral-200">
+                  International Cuisines:
                 </span>
               </span>
               <div className="flex flex-wrap gap-2 mt-1">
@@ -171,11 +173,44 @@ const SectionGridHasMap: FC<SectionGridHasMapProps> = () => {
           </div>
         )}
 
+        {propertyTypeItems.length > 0 && (
+          <div className="flex items-start mb-3">
+            <HomeIcon className="h-5 w-5 text-green-600 mr-2 mt-0.5 flex-shrink-0" />
+            <div>
+              <span className="text-neutral-500 dark:text-neutral-400 mb-2 flex items-center justify-between">
+                <span className="font-medium text-neutral-700 dark:text-neutral-200">
+                  Restaurant Type:
+                </span>
+              </span>
+              <div className="flex flex-wrap gap-2 mt-1">
+                {propertyTypeItems.map((item) => (
+                  <span
+                    key={item}
+                    className="inline-flex items-center px-3 py-1.5 rounded-full text-sm bg-green-100 text-green-600 border border-green-200 hover:bg-green-50 cursor-pointer"
+                    onClick={() => handleFilterPillClick('property')}
+                  >
+                    {item}
+                    <button
+                      className="ml-1.5 text-green-500 hover:text-green-700 focus:outline-none"
+                      onClick={(e) => handleRemovePropertyType(item, e)}
+                      aria-label={`Remove ${item} property type`}
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                      </svg>
+                    </button>
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="flex items-start">
           <MapPinIcon className="h-5 w-5 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
           <div>
-            <span className="block text-bold  dark:text-neutral-400 mb-2">
-              Distance:
+            <span className="block text-neutral-600 dark:text-neutral-300 font-medium text-base">
+              Distance Range:
             </span>
             <div className="flex flex-wrap gap-2 mt-1">
               <span
@@ -198,6 +233,22 @@ const SectionGridHasMap: FC<SectionGridHasMapProps> = () => {
         </div>
       </div>
     );
+  };
+
+  // Add handler for removing property types
+  const handleRemovePropertyType = (propertyType: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const currentTypes = searchParams.get('propertyTypes')?.split(',') || [];
+    const updatedTypes = currentTypes.filter(type => type !== propertyType);
+    
+    const params = new URLSearchParams(searchParams.toString());
+    if (updatedTypes.length > 0) {
+      params.set('propertyTypes', updatedTypes.join(','));
+    } else {
+      params.delete('propertyTypes');
+    }
+    
+    router.push(`/listing-stay-map?${params.toString()}`);
   };
 
   const [filtersVisible, setFiltersVisible] = useState(true);

@@ -6,22 +6,28 @@ import ButtonSubmit from "../ButtonSubmit";
 import RestaurantType from "./RestaurantType";
 import DistanceRange from "./DistanceRange";
 import PropertyTypeSelect from "./PropertyTypeSelect";
-export interface RestaurantSearchFormProps {
+
+interface RestaurantSearchFormProps {
   activeTab?: SearchTab;
   defaultSearchText?: string;
   defaultSearchDistance?: string;
   defaultSelectedItems?: string[];
+  defaultPropertyTypes?: string[];
+  onPropertyTypeChange?: (selectedTypes: string[]) => void;
 }
 
-const RestaurantSearchForm: FC<RestaurantSearchFormProps> = ({ 
+const RestaurantSearchForm: FC<RestaurantSearchFormProps> = ({
   activeTab = "Near Me",
   defaultSearchText = "",
   defaultSearchDistance = "0-10",
-  defaultSelectedItems = []
+  defaultSelectedItems = [],
+  defaultPropertyTypes = [],
+  onPropertyTypeChange
 }) => {
   const [searchText, setSearchText] = useState(defaultSearchText);
   const [searchDistance, setSearchDistance] = useState(defaultSearchDistance);
   const [selectedItems, setSelectedItems] = useState<string[]>(defaultSelectedItems);
+  const [selectedPropertyTypes, setSelectedPropertyTypes] = useState<string[]>(defaultPropertyTypes);
   const router = useRouter();
   const searchBoxRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
@@ -38,41 +44,38 @@ const RestaurantSearchForm: FC<RestaurantSearchFormProps> = ({
   };
 
   // Handle form submission
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
-    // Build query parameters
-    const queryParams = new URLSearchParams();
-    
+    const params = new URLSearchParams();
+
+    // Add category
     if (activeTab) {
-      queryParams.append("category", activeTab);
+      params.append('category', activeTab);
     }
-    
+
+    // Add search query
     if (searchText) {
-      queryParams.append("query", searchText);
+      params.append('query', searchText);
     }
-    
+
+    // Add distance range
     if (searchDistance) {
-      queryParams.append("distance", searchDistance);
+      params.append('distance', searchDistance);
     }
-    
-    // Add selected items from RestaurantType if any
-    if (selectedItems.length > 0) {
-      queryParams.append("filters", selectedItems.join(','));
+
+    // Add cuisine filters
+    if (selectedItems && selectedItems.length > 0) {
+      params.append('filters', selectedItems.join(','));
     }
-    
-    // Log what we're actually submitting for debugging
-    console.log("Submitting with params:", {
-      category: activeTab,
-      query: searchText,
-      distance: searchDistance,
-      filters: selectedItems.join(',')
-    });
-    
-    // Navigate to search results page
-    const queryString = queryParams.toString();
-    const url = `/listing-stay-map${queryString ? `?${queryString}` : ''}`;
-    router.push(url as any);
+
+    // Add property types
+    if (selectedPropertyTypes && selectedPropertyTypes.length > 0) {
+      params.append('propertyTypes', selectedPropertyTypes.join(','));
+    }
+
+    // Navigate to the search results page with all parameters
+    const searchUrl = `/listing-stay-map?${params.toString()}`;
+    router.push(searchUrl as any);
   };
 
   // Handle distance change
@@ -105,55 +108,130 @@ const RestaurantSearchForm: FC<RestaurantSearchFormProps> = ({
     }
   }, [activeTab, searchText, searchDistance, selectedItems]);
 
+  const handlePropertyTypeSelect = (selectedTypes: string[]) => {
+    setSelectedPropertyTypes(selectedTypes);
+    if (onPropertyTypeChange) {
+      onPropertyTypeChange(selectedTypes);
+    }
+  };
+
   return (
     <form 
       ref={formRef}
       className="w-full relative xl:mt-8 flex flex-col lg:flex-row lg:items-center rounded-3xl lg:rounded-full shadow-xl dark:shadow-2xl bg-white dark:bg-neutral-800 divide-y divide-neutral-200 dark:divide-neutral-700 lg:divide-y-0"
       onSubmit={handleSubmit}
     >
-      <div ref={searchBoxRef} className="flex-[1.5]">
-        <RRSearchBox 
-          className="w-full" 
-          onChange={handleSearchTextChange}
-          initialValue={defaultSearchText}
-        />
-      </div>
-
-      <div className="self-center border-r border-slate-200 dark:border-slate-700 h-8"></div>
-      {showRestaurantType ? (
-        <RestaurantType 
-          activeTab={activeTab} 
-          className="flex-1" 
-          onSelectionChange={handleSelectionChange}
-          initialValue={defaultSelectedItems}
-        />
-      ) : null}
-      
-      <div className="self-center border-r border-slate-200 dark:border-slate-700 h-8">
+      {activeTab === "International Cuisine" ? (
+        // Order for International Cuisine tab
+        <>
+          {showRestaurantType && (
+            <>
+              <RestaurantType 
+                activeTab={activeTab} 
+                className="flex-1" 
+                onSelectionChange={handleSelectionChange}
+                initialValue={defaultSelectedItems}
+              />
+              <div className="self-center border-r border-slate-200 dark:border-slate-700 h-8" />
+            </>
+          )}
+          
+          <div ref={searchBoxRef} className="flex-[1.5]">
+            <RRSearchBox 
+              className="w-full" 
+              onChange={handleSearchTextChange}
+              initialValue={defaultSearchText}
+            />
+          </div>
+          
+          <div className="self-center border-r border-slate-200 dark:border-slate-700 h-8" />
+          
+              <DistanceRange 
+                activeTab={activeTab}
+                onDistanceChange={handleDistanceChange} 
+                defaultSearchDistance={defaultSearchDistance}
+              />
             
-      </div>
-      <PropertyTypeSelect />
-      <div className="flex-[1.3] flex items-center">
-        <div className="flex-grow">
-          <DistanceRange 
-            activeTab={activeTab}
-            onDistanceChange={handleDistanceChange} 
-            defaultSearchDistance={defaultSearchDistance}
+          
+          
+          <div className="self-center border-r border-slate-200 dark:border-slate-700 h-8" />
+          
+          <div className="flex-[1.3] flex items-center">
+          <PropertyTypeSelect
+            onChange={handlePropertyTypeSelect}
+            defaultPropertyTypes={defaultPropertyTypes}
           />
-        </div>
-        
-        <div className="pr-2 xl:pr-4">
-          <ButtonSubmit 
-            type="submit"
-            searchParams={{
-              category: activeTab,
-              query: searchText,
-              distance: searchDistance,
-              filters: selectedItems.length > 0 ? selectedItems.join(',') : ''
-            }} 
+            
+            <div className="pr-2 xl:pr-4">
+              <ButtonSubmit 
+                type="submit"
+                searchParams={{
+                  category: activeTab,
+                  query: searchText,
+                  distance: searchDistance,
+                  filters: selectedItems.length > 0 ? selectedItems.join(',') : '',
+                  propertyTypes: selectedPropertyTypes.length > 0 ? selectedPropertyTypes.join(',') : ''
+                }} 
+              />
+            </div>
+          </div>
+        </>
+      ) : (
+        // Default order for other tabs
+        <>
+          <div ref={searchBoxRef} className="flex-[1.5]">
+            <RRSearchBox 
+              className="w-full" 
+              onChange={handleSearchTextChange}
+              initialValue={defaultSearchText}
+            />
+          </div>
+
+          <div className="self-center border-r border-slate-200 dark:border-slate-700 h-8" />
+          
+          {showRestaurantType && (
+            <>
+              <RestaurantType 
+                activeTab={activeTab} 
+                className="flex-1" 
+                onSelectionChange={handleSelectionChange}
+                initialValue={defaultSelectedItems}
+              />
+              <div className="self-center border-r border-slate-200 dark:border-slate-700 h-8" />
+            </>
+          )}
+          
+          <PropertyTypeSelect
+            onChange={handlePropertyTypeSelect}
+            defaultPropertyTypes={defaultPropertyTypes}
           />
-        </div>
-      </div>
+          
+          <div className="self-center border-r border-slate-200 dark:border-slate-700 h-8" />
+          
+          <div className="flex-[1.3] flex items-center">
+            <div className="flex-grow">
+              <DistanceRange 
+                activeTab={activeTab}
+                onDistanceChange={handleDistanceChange} 
+                defaultSearchDistance={defaultSearchDistance}
+              />
+            </div>
+            
+            <div className="pr-2 xl:pr-4">
+              <ButtonSubmit 
+                type="submit"
+                searchParams={{
+                  category: activeTab,
+                  query: searchText,
+                  distance: searchDistance,
+                  filters: selectedItems.length > 0 ? selectedItems.join(',') : '',
+                  propertyTypes: selectedPropertyTypes.length > 0 ? selectedPropertyTypes.join(',') : ''
+                }} 
+              />
+            </div>
+          </div>
+        </>
+      )}
     </form>
   );
 };

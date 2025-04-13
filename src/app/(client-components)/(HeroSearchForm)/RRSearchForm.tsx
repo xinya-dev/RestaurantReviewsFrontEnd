@@ -26,6 +26,7 @@ export interface RRSearchFormProps {
   defaultSearchText?: string;
   defaultSearchDistance?: string;
   defaultSelectedItems?: string[];
+  defaultPropertyTypes?: string[];
   tabClassName?: string;
 }
 
@@ -36,6 +37,7 @@ const RRSearchForm: FC<RRSearchFormProps> = ({
   defaultSearchText,
   defaultSearchDistance,
   defaultSelectedItems,
+  defaultPropertyTypes,
   tabClassName = "p-4 h-[100px] w-[95px]"
 }) => {
   const tabs: {id: SearchTab, icon: any, name: string, displayName?: string}[] = [
@@ -73,6 +75,11 @@ const RRSearchForm: FC<RRSearchFormProps> = ({
   ];
   
   const [tabActive, setTabActive] = useState<SearchTab>(currentTab);
+  const [selectedPropertyTypes, setSelectedPropertyTypes] = useState<string[]>(defaultPropertyTypes || []);
+
+  const handlePropertyTypeChange = (selectedTypes: string[]) => {
+    setSelectedPropertyTypes(selectedTypes);
+  };
 
   const renderTab = () => {
     return (
@@ -136,7 +143,16 @@ const RRSearchForm: FC<RRSearchFormProps> = ({
   };
 
   const renderForm = () => {
-    return <RestaurantSearchForm activeTab={tabActive} defaultSearchText={defaultSearchText} defaultSearchDistance={defaultSearchDistance} defaultSelectedItems={defaultSelectedItems} />;
+    return (
+      <RestaurantSearchForm 
+        activeTab={tabActive} 
+        defaultSearchText={defaultSearchText} 
+        defaultSearchDistance={defaultSearchDistance} 
+        defaultSelectedItems={defaultSelectedItems}
+        defaultPropertyTypes={selectedPropertyTypes}
+        onPropertyTypeChange={handlePropertyTypeChange}
+      />
+    );
   };
 
   return (

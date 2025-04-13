@@ -30,12 +30,12 @@ const Logo: React.FC<LogoProps> = ({
       {/* Restaurant logo with text */}
       <div className="flex items-center justify-center">
         {/* Logo image */}
-        <div className="w-12 h-12 relative">
+        <div className="w-16 h-16 relative">
           <Image 
             src="/images/RRLogo.png" 
             alt="Restaurant Reviews Logo" 
-            width={72} 
-            height={72}
+            width={100} 
+            height={100}
             className="object-contain" 
           />
         </div>
