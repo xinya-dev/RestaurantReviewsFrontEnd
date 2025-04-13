@@ -10,10 +10,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Alert from "@/shared/Alert";
 
-interface PageLoginProps {
-  className?: string;
-}
-
 const loginSocials = [
   {
     name: "Continue with Facebook",
@@ -38,7 +34,7 @@ interface AlertState {
   show: boolean;
 }
 
-const PageLogin = ({ className = "" }: PageLoginProps) => {
+export default function PageLogin() {
   const router = useRouter();
   const [formData, setFormData] = useState({
     email_or_username: '',
@@ -112,7 +108,7 @@ const PageLogin = ({ className = "" }: PageLoginProps) => {
   };
 
   return (
-    <div className={`nc-PageLogin ${className}`} data-nc-id="PageLogin">
+    <div className="nc-PageLogin" data-nc-id="PageLogin">
       <div className="container mb-24 lg:mb-32">
         <h2 className="my-20 flex items-center text-3xl leading-[115%] md:text-5xl md:leading-[115%] font-semibold text-neutral-900 dark:text-neutral-100 justify-center">
           Login
@@ -202,6 +198,4 @@ const PageLogin = ({ className = "" }: PageLoginProps) => {
       </div>
     </div>
   );
-};
-
-export default PageLogin;
+}
