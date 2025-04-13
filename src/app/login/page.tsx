@@ -1,5 +1,5 @@
 "use client";
-import React, { FC, useState } from "react";
+import React, { useState } from "react";
 import facebookSvg from "@/images/Facebook.svg";
 import twitterSvg from "@/images/Twitter.svg";
 import googleSvg from "@/images/Google.svg";
@@ -38,7 +38,7 @@ interface AlertState {
   show: boolean;
 }
 
-const PageLogin: FC<PageLoginProps> = ({ className = "" }) => {
+const PageLogin = ({ className = "" }: PageLoginProps) => {
   const router = useRouter();
   const [formData, setFormData] = useState({
     email_or_username: '',
@@ -65,7 +65,7 @@ const PageLogin: FC<PageLoginProps> = ({ className = "" }) => {
     setAlert({ type: 'success', message: '', show: false });
 
     try {
-      const response = await fetch('http://35.92.149.12:8000/api/auth/login/', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/login/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
