@@ -11,8 +11,8 @@
 
 # For dynamic redirects and better support
 [[redirects]]
-  from = "/api/*"
-  to = "/.netlify/functions/proxy-api"
+  from = "/.netlify/functions/*"
+  to = "/.netlify/functions/:splat"
   status = 200
   force = true
 

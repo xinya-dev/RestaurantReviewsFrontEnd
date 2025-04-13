@@ -62,8 +62,8 @@ export default function PageLogin() {
     setAlert({ type: 'success', message: '', show: false });
 
     try {
-      // Use relative URL for the proxy endpoint
-      const fullUrl = '/api/auth/login';
+      // Use the Netlify function URL
+      const fullUrl = '/.netlify/functions/proxy-api';
       console.log('Login Request Data:', formData);
       
       const response = await fetch(fullUrl, {
