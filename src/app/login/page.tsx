@@ -62,9 +62,8 @@ export default function PageLogin() {
     setAlert({ type: 'success', message: '', show: false });
 
     try {
-      // Always use HTTP for the API URL
-      const apiUrl = 'http://35.92.149.12:8000';
-      const fullUrl = `${apiUrl}/api/auth/login/`;
+      // Use relative URL for the proxy endpoint
+      const fullUrl = '/api/auth/login';
       console.log('Login Request Data:', formData);
       
       const response = await fetch(fullUrl, {
