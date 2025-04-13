@@ -66,6 +66,14 @@ export default function PageLogin() {
       const fullUrl = `${apiUrl}/api/auth/login/`;
       console.log('Login Request Data:', formData);
       
+      // Add a meta tag dynamically to allow mixed content if needed
+      if (typeof window !== 'undefined' && window.location.protocol === 'https:') {
+        const meta = document.createElement('meta');
+        meta.httpEquiv = 'Content-Security-Policy';
+        meta.content = 'upgrade-insecure-requests';
+        document.head.appendChild(meta);
+      }
+      
       const response = await fetch(fullUrl, {
         method: 'POST',
         headers: {
@@ -140,9 +148,16 @@ export default function PageLogin() {
       }
     } catch (error) {
       console.error('Login error:', error);
+      let errorMessage = 'An error occurred. Please try again.';
+      
+      // Handle network errors specifically
+      if (error instanceof TypeError && error.message === 'Failed to fetch') {
+        errorMessage = 'Unable to connect to the server. Please check your internet connection and try again.';
+      }
+      
       setAlert({
         type: 'error',
-        message: error instanceof Error ? error.message : 'An error occurred. Please try again.',
+        message: errorMessage,
         show: true
       });
     } finally {
