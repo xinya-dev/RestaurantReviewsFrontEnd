@@ -9,6 +9,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Alert from "@/shared/Alert";
+import { Route } from "@/routers/types";
 
 const loginSocials = [
   {
@@ -61,7 +62,11 @@ export default function PageLogin() {
     setAlert({ type: 'success', message: '', show: false });
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/login/`, {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://35.92.149.12:8000';
+      const fullUrl = `${apiUrl}/api/auth/login/`;
+      console.log('Login Request Data:', formData);
+      
+      const response = await fetch(fullUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -70,12 +75,28 @@ export default function PageLogin() {
         body: JSON.stringify(formData),
       });
 
-      const data = await response.json();
+      console.log('Response status:', response.status);
+      const responseText = await response.text();
+      console.log('Raw response:', responseText);
+      
+      let data;
+      try {
+        data = JSON.parse(responseText);
+        console.log('Parsed response data:', data);
+      } catch (e) {
+        console.error('Error parsing response:', e);
+        setAlert({
+          type: 'error',
+          message: 'Server returned an invalid response. Please try again.',
+          show: true
+        });
+        return;
+      }
 
       if (response.ok) {
-        // Store tokens and user data
-        localStorage.setItem('access_token', data.access_token);
-        localStorage.setItem('refresh_token', data.refresh_token);
+        // Store tokens and user data according to API response structure
+        localStorage.setItem('access_token', data.access);
+        localStorage.setItem('refresh_token', data.refresh);
         localStorage.setItem('user', JSON.stringify(data.user));
 
         // Dispatch auth state change event
@@ -90,16 +111,38 @@ export default function PageLogin() {
         // Redirect to home page
         router.push('/');
       } else {
+        // Handle error response according to API structure
+        let errorMessage = 'Login failed. Please try again.';
+        
+        if (data) {
+          if (typeof data.error === 'object' && data.error !== null) {
+            if ('error' in data.error) {
+              errorMessage = data.error.error;
+            } else {
+              const firstError = Object.values(data.error)[0];
+              if (Array.isArray(firstError) && firstError.length > 0) {
+                errorMessage = firstError[0];
+              }
+            }
+          } else if (typeof data.error === 'string') {
+            errorMessage = data.error;
+          } else if (data.detail) {
+            errorMessage = data.detail;
+          }
+        }
+        
+        console.error('Login error:', errorMessage);
         setAlert({
           type: 'error',
-          message: data.detail || 'Login failed. Please try again.',
+          message: errorMessage,
           show: true
         });
       }
     } catch (error) {
+      console.error('Login error:', error);
       setAlert({
         type: 'error',
-        message: 'An error occurred. Please try again.',
+        message: error instanceof Error ? error.message : 'An error occurred. Please try again.',
         show: true
       });
     } finally {
@@ -166,7 +209,7 @@ export default function PageLogin() {
             <label className="block">
               <span className="flex justify-between items-center text-neutral-800 dark:text-neutral-200">
                 Password
-                <Link href="/login" className="text-sm underline font-medium">
+                <Link href={"/login" as Route} className="text-sm underline font-medium">
                   Forgot password?
                 </Link>
               </span>
@@ -188,7 +231,7 @@ export default function PageLogin() {
           <span className="block text-center text-neutral-700 dark:text-neutral-300">
             New user? {` `}
             <Link
-              href="/signup"
+              href={"/signup" as Route}
               className="text-neutral-6000 hover:text-black dark:text-neutral-300 dark:hover:text-white"
             >
               Create an account
