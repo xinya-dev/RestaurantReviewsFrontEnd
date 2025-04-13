@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import facebookSvg from "@/images/Facebook.svg";
 import twitterSvg from "@/images/Twitter.svg";
 import googleSvg from "@/images/Google.svg";
@@ -48,6 +48,21 @@ export default function PageLogin() {
     show: false
   });
 
+  useEffect(() => {
+    // Add meta tag for mixed content when the component mounts
+    if (typeof window !== 'undefined' && window.location.protocol === 'https:') {
+      const meta = document.createElement('meta');
+      meta.httpEquiv = 'Content-Security-Policy';
+      meta.content = 'upgrade-insecure-requests';
+      document.head.appendChild(meta);
+
+      // Cleanup function to remove the meta tag when component unmounts
+      return () => {
+        document.head.removeChild(meta);
+      };
+    }
+  }, []);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -66,20 +81,15 @@ export default function PageLogin() {
       const fullUrl = `${apiUrl}/api/auth/login/`;
       console.log('Login Request Data:', formData);
       
-      // Add a meta tag dynamically to allow mixed content if needed
-      if (typeof window !== 'undefined' && window.location.protocol === 'https:') {
-        const meta = document.createElement('meta');
-        meta.httpEquiv = 'Content-Security-Policy';
-        meta.content = 'upgrade-insecure-requests';
-        document.head.appendChild(meta);
-      }
-      
+      // Try to use the fetch API with credentials
       const response = await fetch(fullUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
+          'Access-Control-Allow-Origin': '*',
         },
+        credentials: 'include',
         body: JSON.stringify(formData),
       });
 
@@ -150,9 +160,8 @@ export default function PageLogin() {
       console.error('Login error:', error);
       let errorMessage = 'An error occurred. Please try again.';
       
-      // Handle network errors specifically
       if (error instanceof TypeError && error.message === 'Failed to fetch') {
-        errorMessage = 'Unable to connect to the server. Please check your internet connection and try again.';
+        errorMessage = 'Unable to connect to the server. If you\'re using HTTPS, try accessing the site using HTTP instead.';
       }
       
       setAlert({
