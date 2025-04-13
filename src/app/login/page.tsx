@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import facebookSvg from "@/images/Facebook.svg";
 import twitterSvg from "@/images/Twitter.svg";
 import googleSvg from "@/images/Google.svg";
@@ -48,21 +48,6 @@ export default function PageLogin() {
     show: false
   });
 
-  useEffect(() => {
-    // Add meta tag for mixed content when the component mounts
-    if (typeof window !== 'undefined' && window.location.protocol === 'https:') {
-      const meta = document.createElement('meta');
-      meta.httpEquiv = 'Content-Security-Policy';
-      meta.content = 'upgrade-insecure-requests';
-      document.head.appendChild(meta);
-
-      // Cleanup function to remove the meta tag when component unmounts
-      return () => {
-        document.head.removeChild(meta);
-      };
-    }
-  }, []);
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -77,19 +62,17 @@ export default function PageLogin() {
     setAlert({ type: 'success', message: '', show: false });
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://35.92.149.12:8000';
+      // Always use HTTP for the API URL
+      const apiUrl = 'http://35.92.149.12:8000';
       const fullUrl = `${apiUrl}/api/auth/login/`;
       console.log('Login Request Data:', formData);
       
-      // Try to use the fetch API with credentials
       const response = await fetch(fullUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
-          'Access-Control-Allow-Origin': '*',
         },
-        credentials: 'include',
         body: JSON.stringify(formData),
       });
 
@@ -112,12 +95,11 @@ export default function PageLogin() {
       }
 
       if (response.ok) {
-        // Store tokens and user data according to API response structure
+        // Store tokens and user data
         localStorage.setItem('access_token', data.access);
         localStorage.setItem('refresh_token', data.refresh);
         localStorage.setItem('user', JSON.stringify(data.user));
 
-        // Dispatch auth state change event
         window.dispatchEvent(new Event('authStateChange'));
 
         setAlert({
@@ -126,10 +108,8 @@ export default function PageLogin() {
           show: true
         });
 
-        // Redirect to home page
         router.push('/');
       } else {
-        // Handle error response according to API structure
         let errorMessage = 'Login failed. Please try again.';
         
         if (data) {
@@ -149,7 +129,6 @@ export default function PageLogin() {
           }
         }
         
-        console.error('Login error:', errorMessage);
         setAlert({
           type: 'error',
           message: errorMessage,
@@ -158,15 +137,9 @@ export default function PageLogin() {
       }
     } catch (error) {
       console.error('Login error:', error);
-      let errorMessage = 'An error occurred. Please try again.';
-      
-      if (error instanceof TypeError && error.message === 'Failed to fetch') {
-        errorMessage = 'Unable to connect to the server. If you\'re using HTTPS, try accessing the site using HTTP instead.';
-      }
-      
       setAlert({
         type: 'error',
-        message: errorMessage,
+        message: 'Unable to connect to the server. Please try again.',
         show: true
       });
     } finally {
