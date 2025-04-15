@@ -654,7 +654,7 @@ const PropertyTypeSelect: FC<PropertyTypeSelectProps> = ({
                               key={item.name} 
                               className={`group cursor-pointer transition-all duration-300 relative bg-gray-100 dark:bg-gray-900/20 ${
                                 item.checked 
-                                  ? ' bg-gray-200 dark:bg-gray-900/20 rounded-xl' 
+                                  ? 'border-2 border-blue-300 dark:bg-gray-900/20 rounded-xl' 
                                   : 'hover:bg-neutral-50 dark:hover:bg-neutral-800 rounded-xl'
                               }`}
                               onClick={(e) => {
