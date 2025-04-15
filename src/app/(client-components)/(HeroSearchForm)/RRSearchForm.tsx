@@ -144,14 +144,16 @@ const RRSearchForm: FC<RRSearchFormProps> = ({
 
   const renderForm = () => {
     return (
-      <RestaurantSearchForm 
-        activeTab={tabActive} 
-        defaultSearchText={defaultSearchText} 
-        defaultSearchDistance={defaultSearchDistance} 
-        defaultSelectedItems={defaultSelectedItems}
-        defaultPropertyTypes={selectedPropertyTypes}
-        onPropertyTypeChange={handlePropertyTypeChange}
-      />
+      <div className="relative mt-8">
+        <RestaurantSearchForm 
+          activeTab={tabActive} 
+          defaultSearchText={defaultSearchText} 
+          defaultSearchDistance={defaultSearchDistance} 
+          defaultSelectedItems={defaultSelectedItems}
+          defaultPropertyTypes={selectedPropertyTypes}
+          onPropertyTypeChange={handlePropertyTypeChange}
+        />
+      </div>
     );
   };
 

@@ -27,6 +27,7 @@ const DistanceRange: FC<DistanceRangeProps> = ({
     vertical: 'top' | 'bottom';
     horizontal: 'left' | 'right';
   }>({ vertical: 'bottom', horizontal: 'left' });
+  const [isTooltipVisible, setIsTooltipVisible] = useState(false);
   
   // Listen for the custom dropdown event
   useEffect(() => {
@@ -151,15 +152,29 @@ const DistanceRange: FC<DistanceRangeProps> = ({
       {({ open, close }) => (
         <>
           <div
-            className={`flex-1 z-10 flex items-center focus:outline-none cursor-pointer ${
+            className={`flex-1 z-10 flex items-center focus:outline-none cursor-pointer group ${
               open ? "nc-hero-field-focused" : ""
             }`}
           >
             <Popover.Button
               ref={popoverButtonRef}
+              onMouseEnter={() => setIsTooltipVisible(true)}
+              onMouseLeave={() => setIsTooltipVisible(false)}
+              onClick={() => setIsTooltipVisible(false)}
               className={`flex-1 flex text-left items-center focus:outline-none ${fieldClassName} space-x-3 `}
-              onClickCapture={() => document.querySelector("html")?.click()}
             >
+              {/* Tooltip */}
+              <div
+                className={`absolute transition-opacity bottom-full left-0 mb-2 px-4 py-2 bg-white dark:bg-neutral-800 text-sm rounded-lg shadow-lg border border-neutral-200 dark:border-neutral-700 whitespace-nowrap ${
+                  isTooltipVisible ? 'visible opacity-100' : 'invisible opacity-0'
+                }`}
+              >
+                <div className="font-medium text-neutral-900 dark:text-neutral-100">Set search radius</div>
+                <div className="text-neutral-500 dark:text-neutral-400 text-xs mt-1">Find restaurants within your preferred distance</div>
+                {/* Arrow */}
+                <div className="absolute bottom-0 left-6 transform translate-y-1/2 rotate-45 w-2 h-2 bg-white dark:bg-neutral-800 border-r border-b border-neutral-200 dark:border-neutral-700"></div>
+              </div>
+
               <div className="text-neutral-300 dark:text-neutral-400">
                 <MapIcon className="w-5 h-5 lg:w-7 lg:h-7" />
               </div>

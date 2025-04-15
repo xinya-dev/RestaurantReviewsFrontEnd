@@ -1,5 +1,5 @@
 "use client";
-import React, { Fragment, FC } from "react";
+import React, { Fragment, FC, useState, useRef, useEffect } from "react";
 import { Popover, Transition } from "@headlessui/react";
 import Checkbox from "@/shared/Checkbox";
 import { ClassOfProperties } from "../../type";
@@ -117,6 +117,7 @@ const PropertyTypeSelect: FC<PropertyTypeSelectProps> = ({
   const [searchTerm, setSearchTerm] = React.useState("");
   const buttonRef = React.useRef<HTMLButtonElement>(null);
   const [dropdownPosition, setDropdownPosition] = React.useState<'top' | 'bottom'>('bottom');
+  const [isTooltipVisible, setIsTooltipVisible] = useState(false);
   
   const [typeOfProperty, setTypeOfProperty] = React.useState<ClassOfProperties[]>(() => {
     // Initialize with all items checked if no defaultPropertyTypes provided
@@ -214,9 +215,25 @@ const PropertyTypeSelect: FC<PropertyTypeSelectProps> = ({
         <>
           <Popover.Button
             ref={buttonRef}
-            className={`flex z-10 text-left w-full flex-shrink-0 items-center ${fieldClassName} space-x-3 focus:outline-none cursor-pointer ${open ? "nc-hero-field-focused" : ""
-              }`}
+            onMouseEnter={() => setIsTooltipVisible(true)}
+            onMouseLeave={() => setIsTooltipVisible(false)}
+            onClick={() => setIsTooltipVisible(false)}
+            className={`flex z-10 text-left w-full flex-shrink-0 items-center ${fieldClassName} space-x-3 focus:outline-none cursor-pointer group ${
+              open ? "nc-hero-field-focused" : ""
+            }`}
           >
+            {/* Tooltip */}
+            <div
+              className={`absolute transition-opacity bottom-full left-0 mb-2 px-4 py-2 bg-white dark:bg-neutral-800 text-sm rounded-lg shadow-lg border border-neutral-200 dark:border-neutral-700 whitespace-nowrap ${
+                isTooltipVisible ? 'visible opacity-100' : 'invisible opacity-0'
+              }`}
+            >
+              <div className="font-medium text-neutral-900 dark:text-neutral-100">Choose restaurant type</div>
+              <div className="text-neutral-500 dark:text-neutral-400 text-xs mt-1">Filter by dining style and atmosphere</div>
+              {/* Arrow */}
+              <div className="absolute bottom-0 left-6 transform translate-y-1/2 rotate-45 w-2 h-2 bg-white dark:bg-neutral-800 border-r border-b border-neutral-200 dark:border-neutral-700"></div>
+            </div>
+
             <div className="text-neutral-300 dark:text-neutral-400">
               <HomeIcon className="w-5 h-5 lg:w-7 lg:h-7" />
             </div>
@@ -226,7 +243,7 @@ const PropertyTypeSelect: FC<PropertyTypeSelectProps> = ({
                   {typeOfPropertyText || "All..."}
                 </span>
               </span>
-              <span className="block mt-1 text-sm text-neutral-400 leading-none font-light ">
+              <span className="block mt-1 text-sm text-neutral-400 leading-none font-light truncate">
                 Select Restaurant Type
               </span>
             </div>

@@ -1,5 +1,5 @@
 "use client";
-import React, { Fragment, FC, useEffect } from "react";
+import React, { Fragment, FC, useEffect, useState, useRef } from "react";
 import { Popover, Transition } from "@headlessui/react";
 import Checkbox from "@/shared/Checkbox";
 import { ClassOfProperties } from "../../type";
@@ -82,7 +82,7 @@ const cuisineImages: Record<CuisineName, string> = {
 const cuisineTypes: CuisineType[] = [
   {
     name: "All",
-    description: "All International Cuisines",
+    description: "Select all cuisines",
     checked: true,
     flag: "un"  // United Nations flag represents global/international
   },
@@ -323,6 +323,7 @@ const PropertyTypeSelect: FC<PropertyTypeSelectProps> = ({
     vertical: 'top' | 'bottom';
   }>({ horizontal: 'center', vertical: 'bottom' });
   const buttonRef = React.useRef<HTMLButtonElement>(null);
+  const [isTooltipVisible, setIsTooltipVisible] = useState(false);
 
   // Listen for the custom dropdown event
   useEffect(() => {
@@ -466,7 +467,7 @@ const PropertyTypeSelect: FC<PropertyTypeSelectProps> = ({
   if (typeOfProperty && typeOfProperty.length > 0) {
     const checkedItems = typeOfProperty.filter((item) => item.checked);
     if (checkedItems.length === typeOfProperty.length) {
-      typeOfPropertyText = `All ${getLabel()}`;
+      typeOfPropertyText = "All...";
     } else if (checkedItems.length > 0) {
       typeOfPropertyText = checkedItems
         .filter((item) => item.name !== "All")
@@ -556,15 +557,40 @@ const PropertyTypeSelect: FC<PropertyTypeSelectProps> = ({
     }
   }, [typeOfProperty, onSelectionChange]);
 
+  const handleButtonClick = (open: boolean, close: () => void) => {
+    // This logic assumes the button click toggles the popover state
+    if (open) {
+      close();
+    } else {
+      buttonRef.current?.click();
+    }
+    setIsTooltipVisible(false); // Hide tooltip on click
+  };
+
   return (
     <Popover className={`flex relative ${className || 'flex-1'}`}>
       {({ open, close }) => (
         <>
           <Popover.Button
             ref={buttonRef}
-            className={`flex z-10 text-left w-full flex-shrink-0 items-center ${fieldClassName} space-x-3 focus:outline-none cursor-pointer ${open ? "nc-hero-field-focused" : ""
-              }`}
+            onMouseEnter={() => setIsTooltipVisible(true)}
+            onMouseLeave={() => setIsTooltipVisible(false)}
+            className={`flex z-10 text-left w-full flex-shrink-0 items-center ${fieldClassName} space-x-3 focus:outline-none cursor-pointer group ${
+              open ? "nc-hero-field-focused" : ""
+            }`}
           >
+            {/* Tooltip */}
+            <div
+              className={`absolute transition-opacity bottom-full left-0 mb-2 px-4 py-2 bg-white dark:bg-neutral-800 text-sm rounded-lg shadow-lg border border-neutral-200 dark:border-neutral-700 whitespace-nowrap ${
+                isTooltipVisible ? 'visible opacity-100' : 'invisible opacity-0'
+              }`}
+            >
+              <div className="font-medium text-neutral-900 dark:text-neutral-100">Select your preferred cuisine</div>
+              <div className="text-neutral-500 dark:text-neutral-400 text-xs mt-1">Browse restaurants by cuisine type</div>
+              {/* Arrow */}
+              <div className="absolute bottom-0 left-6 transform translate-y-1/2 rotate-45 w-2 h-2 bg-white dark:bg-neutral-800 border-r border-b border-neutral-200 dark:border-neutral-700"></div>
+            </div>
+
             <div className="text-neutral-300 dark:text-neutral-400">
               <Icon className="w-5 h-5 lg:w-7 lg:h-7" />
             </div>
@@ -574,7 +600,7 @@ const PropertyTypeSelect: FC<PropertyTypeSelectProps> = ({
                   {typeOfPropertyText || getLabel()}
                 </span>
               </span>
-              <span className="block mt-1 text-sm text-neutral-400 leading-none font-light ">
+              <span className="block mt-1 text-sm text-neutral-400 leading-none font-light truncate">
                 {getLabel()}
               </span>
             </div>
@@ -595,38 +621,99 @@ const PropertyTypeSelect: FC<PropertyTypeSelectProps> = ({
           >
             <Popover.Panel
               static
-              className={`will-change-transform sub-menu absolute transform z-10 w-[1100px] px-2 sm:px-0 ${
+              className={`will-change-transform sub-menu absolute transform z-10 w-screen max-w-[1100px] px-4 sm:px-0 left-[110%] -translate-x-1/2 ${
                 dropdownPosition.vertical === 'top'
                   ? 'bottom-[calc(100%+1rem)]'
                   : 'top-[calc(100%+1rem)]'
-              } ${
-                dropdownPosition.horizontal === 'left'
-                  ? 'left-0'
-                  : dropdownPosition.horizontal === 'right'
-                  ? 'right-0'
-                  : 'left-1/2 -translate-x-1/2'
               }`}
             >
               <div className="overflow-hidden rounded-2xl shadow-lg ring-1 ring-black dark:ring-white ring-opacity-5 dark:ring-opacity-10">
                 <div className={`relative bg-white dark:bg-neutral-900 p-8`}>
                   {activeTab === "International Cuisine" ? (
-                    // Grid view for cuisine types
-                    <div 
-                      className="grid grid-cols-8 gap-4 overflow-y-auto scrollbar-thin scrollbar-thumb-neutral-300 dark:scrollbar-thumb-neutral-700 scrollbar-track-transparent"
-                      style={{
-                        scrollbarWidth: 'thin',
-                        msOverflowStyle: 'none',
-                        gridAutoRows: 'min-content',
-                        maxHeight: '180px', // Height of one row plus some padding
-                      }}
-                    >
-                      {typeOfProperty.map((item, index) => {
-                        const cuisineItem = item as CuisineType;
-                        return (
+                    <>
+                      {/* Selection Counter */}
+                      <div className="mb-4 flex items-center justify-between">
+                        <span className="text-sm font-medium text-neutral-500 dark:text-neutral-400">
+                          {typeOfProperty.filter(item => item.checked && item.name !== "All").length} cuisines selected
+                        </span>
+                      </div>
+                      {/* Grid view for cuisine types */}
+                      <div 
+                        className="grid grid-cols-8 gap-4 overflow-y-auto scrollbar-thin scrollbar-thumb-neutral-300 dark:scrollbar-thumb-neutral-700 scrollbar-track-transparent"
+                        style={{
+                          scrollbarWidth: 'thin',
+                          msOverflowStyle: 'none',
+                          gridAutoRows: 'min-content',
+                          maxHeight: '180px',
+                        }}
+                      >
+                        {typeOfProperty.map((item, index) => {
+                          const cuisineItem = item as CuisineType;
+                          return (
+                            <div 
+                              key={item.name} 
+                              className={`group cursor-pointer transition-all duration-300 relative ${
+                                item.checked 
+                                  ? ' bg-gray-200 dark:bg-gray-900/20 rounded-xl' 
+                                  : 'hover:bg-neutral-50 dark:hover:bg-neutral-800 rounded-xl'
+                              }`}
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                handleCheckboxChange(index, !item.checked);
+                              }}
+                            >
+                              {/* Checkbox indicator - hidden by default */}
+                              <div className={`absolute top-2 right-2 z-20 w-5 h-5 rounded-full border-2 opacity-0 ${
+                                item.checked 
+                                  ? 'bg-primary-500 border-primary-500' 
+                                  : 'bg-white border-neutral-300 dark:border-neutral-600'
+                              }`}>
+                                {item.checked && (
+                                  <svg className="w-full h-full text-white" viewBox="0 0 24 24">
+                                    <path fill="currentColor" d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
+                                  </svg>
+                                )}
+                              </div>
+                              
+                              <div className="aspect-w-3 aspect-h-2 overflow-hidden relative rounded-xl">
+                                {/* Flag Image */}
+                                <div className="absolute inset-0 transition-all duration-500 ease-in-out rounded-xl group-hover:scale-75 ">
+                                  <Image 
+                                    alt={`${cuisineItem.name} flag`}
+                                    src={`https://flagcdn.com/w320/${cuisineItem.flag}.png`}
+                                    fill
+                                    className="object-cover rounded-xl"
+                                    sizes="(max-width: 640px) 160px, 320px"
+                                    priority
+                                  />
+                                  {/* Dark overlay for better text readability on hover */}
+                                  <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-0 transition-opacity duration-500 ease-in-out"></div>
+                                </div>
+                              </div>
+                              <div className="relative mt-2 text-center h-20 flex flex-col items-center justify-center overflow-hidden">
+                                {/* Name (shown by default, hidden on hover) */}
+                                <h3 className="absolute w-full text-sm font-medium text-neutral-900 dark:text-neutral-200 transition-all duration-500 ease-in-out transform opacity-100 group-hover:opacity-0 group-hover:-translate-y-2">
+                                  {item.name}
+                                </h3>
+                                {/* Description (shown on hover) */}
+                                <p className="absolute w-full text-xs text-black dark:text-neutral-100 transition-all duration-500 ease-in-out transform translate-y-4 opacity-0 group-hover:opacity-100 group-hover:translate-y-0 px-3">
+                                  {item.description}
+                                </p>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </>
+                  ) : (
+                    // List view for other types
+                    <div className="flex flex-col space-y-4 max-h-[320px] overflow-y-auto">
+                    {typeOfProperty.map((item, index) => (
                           <div 
-                            key={item.name} 
-                            className={`group cursor-pointer  transition-all duration-300 relative ${
-                              item.checked ? 'ring-1 ring-primary-50' : ''
+                            key={item.name}
+                            className={`flex items-center space-x-3 p-3 rounded-lg cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-800 ${
+                              item.checked ? 'bg-neutral-100 dark:bg-neutral-800' : ''
                             }`}
                             onClick={(e) => {
                               e.preventDefault();
@@ -634,97 +721,30 @@ const PropertyTypeSelect: FC<PropertyTypeSelectProps> = ({
                               handleCheckboxChange(index, !item.checked);
                             }}
                           >
-                            {/* Checkbox indicator */}
-                            <div className={`absolute top-2 right-2 z-20 w-5 h-5 rounded-full border-2 ${
+                            {/* Checkbox */}
+                            <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
                               item.checked 
                                 ? 'bg-primary-500 border-primary-500' 
-                                : 'bg-white border-neutral-300 dark:border-neutral-600'
+                                : 'border-neutral-300 dark:border-neutral-600'
                             }`}>
                               {item.checked && (
-                                <svg className="w-full h-full text-white" viewBox="0 0 24 24">
+                                <svg className="w-3 h-3 text-white" viewBox="0 0 24 24">
                                   <path fill="currentColor" d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
                                 </svg>
                               )}
                             </div>
                             
-                            <div className="aspect-w-3 aspect-h-2 overflow-hidden relative ">
-                              {/* Flag Image (shown by default) */}
-                              <div className="absolute inset-0 transition-transform duration-300 ease-in-out transform group-hover:scale-110 group-hover:opacity-0">
-                                <Image 
-                                  alt={`${cuisineItem.name} flag`}
-                                  src={`https://flagcdn.com/w320/${cuisineItem.flag}.png`}
-                                  fill
-                                  className="object-cover "
-                                  sizes="(max-width: 640px) 160px, 320px "
-                                  priority
-                                />
-                              </div>
-                              {/* Cuisine Image (shown on hover) */}
-                              <div className="absolute inset-0 transition-all duration-300 ease-in-out opacity-0 group-hover:opacity-100">
-                                <Image 
-                                  alt={`${cuisineItem.name} cuisine`}
-                                  src={cuisineImages[cuisineItem.name as CuisineName] || `/images/cuisines/default.jpg`}
-                                  fill
-                                  className="object-cover"
-                                  sizes="(max-width: 640px) 160px, 320px"
-                                />
-                                {/* Dark overlay for better text readability */}
-                                <div className="absolute inset-0 bg-black bg-opacity-5 transition-opacity duration-300"></div>
-                              </div>
-                            </div>
-                            <div className="relative mt-2 text-center h-12 flex flex-col items-center justify-center">
-                              {/* Name (shown by default) */}
-                              <h3 className="absolute w-full text-sm font-medium text-neutral-900 dark:text-neutral-200 transition-all duration-300 transform group-hover:-translate-y-2 group-hover:opacity-0 line-clamp-1">
+                            {/* Content */}
+                            <div className="flex-1">
+                              <h3 className="text-base font-medium text-neutral-900 dark:text-neutral-200">
                                 {item.name}
                               </h3>
-                              {/* Description (shown on hover) */}
-                              <p className="absolute w-full text-xs text-neutral-500 dark:text-neutral-400 transition-all duration-300 transform translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 px-2 line-clamp-2">
+                              <p className="text-sm text-neutral-500 dark:text-neutral-400">
                                 {item.description}
                               </p>
                             </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  ) : (
-                    // List view for other types
-                    <div className="flex flex-col space-y-4 max-h-[320px] overflow-y-auto">
-                  {typeOfProperty.map((item, index) => (
-                        <div 
-                          key={item.name}
-                          className={`flex items-center space-x-3 p-3 rounded-lg cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-800 ${
-                            item.checked ? 'bg-neutral-100 dark:bg-neutral-800' : ''
-                          }`}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            handleCheckboxChange(index, !item.checked);
-                          }}
-                        >
-                          {/* Checkbox */}
-                          <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                            item.checked 
-                              ? 'bg-primary-500 border-primary-500' 
-                              : 'border-neutral-300 dark:border-neutral-600'
-                          }`}>
-                            {item.checked && (
-                              <svg className="w-3 h-3 text-white" viewBox="0 0 24 24">
-                                <path fill="currentColor" d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
-                              </svg>
-                            )}
-                          </div>
-                          
-                          {/* Content */}
-                          <div className="flex-1">
-                            <h3 className="text-base font-medium text-neutral-900 dark:text-neutral-200">
-                              {item.name}
-                            </h3>
-                            <p className="text-sm text-neutral-500 dark:text-neutral-400">
-                              {item.description}
-                            </p>
-                          </div>
-                    </div>
-                  ))}
+                      </div>
+                    ))}
                     </div>
                   )}
                 </div>
