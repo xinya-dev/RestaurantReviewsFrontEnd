@@ -652,7 +652,7 @@ const PropertyTypeSelect: FC<PropertyTypeSelectProps> = ({
                           return (
                             <div 
                               key={item.name} 
-                              className={`group cursor-pointer transition-all duration-300 relative ${
+                              className={`group cursor-pointer transition-all duration-300 relative bg-gray-100 dark:bg-gray-900/20 ${
                                 item.checked 
                                   ? ' bg-gray-200 dark:bg-gray-900/20 rounded-xl' 
                                   : 'hover:bg-neutral-50 dark:hover:bg-neutral-800 rounded-xl'
@@ -684,7 +684,7 @@ const PropertyTypeSelect: FC<PropertyTypeSelectProps> = ({
                                     src={`https://flagcdn.com/w320/${cuisineItem.flag}.png`}
                                     fill
                                     className="object-cover rounded-xl"
-                                    sizes="(max-width: 640px) 160px, 320px"
+                                    sizes="(max-width: 640px) 150px, 320px"
                                     priority
                                   />
                                   {/* Dark overlay for better text readability on hover */}
