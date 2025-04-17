@@ -16,21 +16,15 @@ const SectionHeroListing: FC<SectionHeroListingProps> = ({ className = "" }) => 
   
   // Convert the category param to a valid SearchTab or use default
   const validCategories: SearchTab[] = [
-    "Near Me", 
-    "International Cuisine", 
-    "Fine Dining", 
-    "Casual Dining", 
-    "Fast Food", 
-    "Child Friendly", 
-    "Favourite Foods", 
-    "Healthy Foods", 
-    "Cafés & Coffee", 
-    "Todays Specials"
+    "Dine In", 
+    "Take Away", 
+        "Child Friendly", 
+    
   ];
   
   const currentTab: SearchTab = categoryParam && validCategories.includes(categoryParam as SearchTab) 
     ? (categoryParam as SearchTab) 
-    : "Near Me";
+    : "Dine In";
   
   return (
     <div className={`nc-SectionHeroListing relative ${className}`}>
