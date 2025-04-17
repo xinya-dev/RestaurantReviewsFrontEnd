@@ -131,7 +131,7 @@ const RestaurantSearchForm: FC<RestaurantSearchFormProps> = ({
     return (
       <div className="flex-1 flex-shrink-0 lg:w-1/4">
         <RestaurantType
-          activeTab={activeTab}
+          // activeTab={activeTab}
           className="flex-1"
           onSelectionChange={handleSelectionChange}
           initialValue={defaultSelectedItems}

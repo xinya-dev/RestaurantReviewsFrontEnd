@@ -154,14 +154,14 @@ function PageHome() {
   return (
     <main className="nc-PageHome relative overflow-hidden">
       {/* GLASSMOPHIN */}
-      <BgGlassmorphism spanClassName=""/>
+      <BgGlassmorphism spanClassName="" />
 
       <div className="container relative space-y-24 mb-24 lg:space-y-28 lg:mb-28">
         {/* SECTION HERO */}
-        <SectionHero className="pt-10 lg:pt-16 lg:pb-16" />
+        <SectionHero className="pt-10 lg:pt-16 lg:pb-16 mb-100" />
 
         {/* SECTION 1 */}
-        <SectionSliderNewCategories categories={DEMO_CATS} />
+        {/* <SectionSliderNewCategories categories={DEMO_CATS} className="mt-100" /> */}
 
         <SectionOurFeatures />
 

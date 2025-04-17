@@ -278,7 +278,7 @@ const SectionGridHasMap: FC<SectionGridHasMapProps> = () => {
           </div>
           {filtersVisible && (
             <div className="mb-8 lg:mb-11">
-              <TabFilters />
+              <TabFilters page="stay" />
             </div>
           )}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-5 2xl:gap-x-6 gap-y-8">

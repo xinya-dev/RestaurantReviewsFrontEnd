@@ -18,9 +18,7 @@ interface LayoutProps {
 
 // Define valid SearchTab values explicitly for validation
 const validSearchTabs: SearchTab[] = [
-  "Near Me", "International Cuisine", "Fine Dining", "Casual Dining", 
-  "Fast Food", "Child Friendly", "Favourite Foods", "Healthy Foods", 
-  "Cafés & Coffee", "Todays Specials"
+  "Dine In", "Take Away", "Child Friendly"
 ];
 
 // Helper function to check if a string is a valid SearchTab
@@ -45,7 +43,7 @@ const Layout = ({ children, params }: LayoutProps) => {
   // Determine values to pass down, VALIDATING categoryParam
   const currentTabValue: SearchTab = isValidSearchTab(categoryParam) 
     ? categoryParam 
-    : "Near Me"; // Default to "Near Me" if param is missing or invalid
+    : "Dine In"; // Default to "Near Me" if param is missing or invalid
     
   const defaultSearchTextValue = queryParam || "";
   const defaultSearchDistanceValue = distanceParam || "0-20"; // Default distance

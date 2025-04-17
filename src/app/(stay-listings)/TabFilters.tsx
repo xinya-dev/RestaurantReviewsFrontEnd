@@ -1,6 +1,6 @@
 "use client";
 
-import React, { Fragment, useState } from "react";
+import React, { Fragment, useState, FC } from "react";
 import { Dialog, Popover, Transition } from "@headlessui/react";
 import NcInputNumber from "@/components/NcInputNumber";
 import ButtonPrimary from "@/shared/ButtonPrimary";
@@ -9,6 +9,8 @@ import ButtonClose from "@/shared/ButtonClose";
 import Checkbox from "@/shared/Checkbox";
 import Slider from "rc-slider";
 import convertNumbThousand from "@/utils/convertNumbThousand";
+import { Icon } from "@iconify/react";
+
 
 // DEMO DATA
 const typeOfPaces = [
@@ -67,7 +69,12 @@ const moreFilter3 = [
 
 const moreFilter4 = [{ name: " Pets allowed" }, { name: "Smoking allowed" }];
 
-const TabFilters = () => {
+interface TabFiltersProps {
+  className?: string;
+  page?: string;
+}
+
+const TabFilters: FC<TabFiltersProps> = ({ className = "", page = "stay" }) => {
   const [isOpenMoreFilter, setisOpenMoreFilter] = useState(false);
   const [isOpenMoreFilterMobile, setisOpenMoreFilterMobile] = useState(false);
   const [rangePrices, setRangePrices] = useState([0, 1000]);
@@ -95,6 +102,12 @@ const TabFilters = () => {
           />
         </svg>
       </span>
+    );
+  };
+
+  const renderHeroIcon = () => {
+    return (
+      <Icon icon="heroicons:chevron-down" className="w-5 h-5" />
     );
   };
 
@@ -327,6 +340,8 @@ const TabFilters = () => {
               key={item.name}
               name={item.name}
               label={item.name}
+              className="text-primary-500"
+              // labelClassName="text-primary-500"
               defaultChecked={!!item.defaultChecked}
             />
           ))}
@@ -337,6 +352,8 @@ const TabFilters = () => {
               key={item.name}
               name={item.name}
               label={item.name}
+              className="text-primary-500"
+              // labelClassName="text-primary-500"
               defaultChecked={!!item.defaultChecked}
             />
           ))}
@@ -353,7 +370,15 @@ const TabFilters = () => {
           onClick={openModalMoreFilter}
         >
           <span>More filters (3)</span>
-          {renderXClear()}
+          {(() => {
+            switch (page) {
+              case "stay":
+                return renderHeroIcon();
+              case "header":
+                return renderHeroIcon();
+            }
+          })()}
+          
         </div>
 
         <Transition appear show={isOpenMoreFilter} as={Fragment}>
@@ -408,7 +433,7 @@ const TabFilters = () => {
                     <div className="px-10 divide-y divide-neutral-200 dark:divide-neutral-800">
                       <div className="py-7">
                         <h3 className="text-xl font-medium">Amenities</h3>
-                        <div className="mt-6 relative ">
+                        <div className="mt-6 relative text-primary-500">
                           {renderMoreFilterItem(moreFilter1)}
                         </div>
                       </div>
@@ -664,10 +689,25 @@ const TabFilters = () => {
   return (
     <div className="flex lg:space-x-4">
       <div className="hidden lg:flex space-x-4">
-        {renderTabsTypeOfPlace()}
-        {renderTabsPriceRage()}
-        {renderTabsRoomAndBeds()}
-        {renderTabMoreFilter()}
+        {(() => {
+          switch (page) {
+            case "stay":
+              return (
+                <>
+                  {renderTabsTypeOfPlace()}
+                  {renderTabsPriceRage()}
+                  {renderTabsRoomAndBeds()}
+                  {renderTabMoreFilter()}
+                </>
+              );
+            case "header":
+              return (
+                <>
+                  {renderTabMoreFilter()}
+                </>
+              );
+          }
+        })()}
       </div>
       {renderTabMoreFilterMobile()}
     </div>

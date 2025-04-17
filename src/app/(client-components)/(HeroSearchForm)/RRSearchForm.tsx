@@ -14,10 +14,17 @@ import {
   HeartIcon,
   FireIcon,
   CakeIcon,
-  StarIcon
+  StarIcon,
+  CheckCircleIcon,
+  ChevronDownIcon,
+  Bars3Icon
 } from "@heroicons/react/24/outline";
+import Checkbox from "@/shared/Checkbox";
+import Button from "@/shared/Button";
+import ButtonSecondary from "@/shared/ButtonSecondary";
+import TabFilters from "@/app/(stay-listings)/TabFilters";
 
-export type SearchTab = "Near Me" | "International Cuisine" | "Restaurant Type" | "Favourite Foods" | "Todays Specials" | "Fast Food" | "Child Friendly" | "Healthy Foods" | "Cafés & Coffee" | "Fine Dining" | "Casual Dining";
+export type SearchTab = "Dine In" | "Take Away" | "Child Friendly";
 
 export interface RRSearchFormProps {
   className?: string;
@@ -40,42 +47,33 @@ const RRSearchForm: FC<RRSearchFormProps> = ({
   defaultPropertyTypes,
   tabClassName = "p-4 h-[100px] w-[95px]"
 }) => {
-  const tabs: {id: SearchTab, icon: any, name: string, displayName?: string}[] = [
+  const tabs: { id: SearchTab, icon: any, name: string, displayName?: string }[] = [
     {
-      id: "Near Me",
+      id: "Dine In",
       icon: MapPinIcon,
-      name: "Near Me"
+      name: "Dine In"
     },
     {
-      id: "International Cuisine",
+      id: "Take Away",
       icon: GlobeAsiaAustraliaIcon,
-      name: "International Cuisine",
-      displayName: "International\nCuisines"
+      name: "Take Away",
+      displayName: "Take Away"
     },
     {
-      id: "Restaurant Type",
+      id: "Child Friendly",
       icon: SparklesIcon,
-      name: "Restaurant Type",
-      displayName: "Restaurant\nType"
+      name: "Child Friendly",
+      displayName: "Child Friendly"
     },
-   
-    {
-      id: "Favourite Foods",
-      icon: HeartIcon,
-      name: "Favourite Foods",
-      displayName: "Favourite\nFoods"
-    },
-   
-    {
-      id: "Todays Specials",
-      icon: StarIcon,
-      name: "Todays Specials",
-      displayName: "Todays\nSpecials"
-    }
+
+
   ];
-  
-  const [tabActive, setTabActive] = useState<SearchTab>(currentTab);
+
+  // const [tabActive, setTabActive] = useState<SearchTab>(currentTab); 
   const [selectedPropertyTypes, setSelectedPropertyTypes] = useState<string[]>(defaultPropertyTypes || []);
+  const [modalOpen, setModalOpen] = useState(false);
+
+
 
   const handlePropertyTypeChange = (selectedTypes: string[]) => {
     setSelectedPropertyTypes(selectedTypes);
@@ -85,29 +83,39 @@ const RRSearchForm: FC<RRSearchFormProps> = ({
     return (
       <div className="flex flex-col items-center w-full space-y-4">
         {/* First row - original 6 tabs */}
-        <ul className="flex flex-wrap justify-center gap-2 lg:gap-3 w-full">
+        <ul className="flex flex-wrap justify-center items-center gap-2  w-full">
           {tabs.slice(0, 10).map((tab) => {
-            const active = tab.id === tabActive;
+            // const active = tab.id === tabActive;
             const Icon = tab.icon;
             return (
               <li
-                onClick={() => setTabActive(tab.id)}
-                className={`flex-shrink-0 cursor-pointer group ${active ? "cursor-default" : ""}`}
+                // onClick={() => setTabActive(tab.id)}
+                className={`flex-shrink-0 cursor-pointer group `}
                 key={tab.id}
               >
-                <div className={`flex flex-col items-center justify-center rounded-2xl transition-all duration-200 ${tabClassName} ${
-                  active 
-                    ? "bg-primary-6000 text-white shadow-lg transform scale-105"
-                    : "bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700"
-                }`}>
-                  <Icon className={`w-6 h-6 mb-2 ${active ? "text-white" : "text-neutral-600 dark:text-neutral-400"}`} />
-                  <span className="text-sm font-medium text-center whitespace-pre-line">
-                    {tab.displayName || tab.name}
-                  </span>
-                </div>
+
+
+                <Checkbox className="text-sm font-medium text-center whitespace-pre-line text-white "
+                  defaultChecked={true}
+                  label={tab.displayName || tab.name}
+                  name={tab.id}
+                >
+
+                </Checkbox>
+
+
               </li>
+
             );
           })}
+
+          <div className="w-300 text-white flex items-center justify-center gap-2" >
+            {/* <ButtonSecondary className="flex items-center justify-center gap-1.5 py-0.5 px-1.5 text-sm rounded-full ">
+              <Bars3Icon className="w-5 h-5 text-primary-500" />
+              Show All Filters
+            </ButtonSecondary> */}
+            <TabFilters page="header" className="flex items-center justify-center gap-1.5 py-0.5 px-1.5 text-sm rounded-full " />
+          </div>
         </ul>
         {/* Second row - new tabs */}
         {/* <ul className="flex flex-wrap justify-center gap-4 lg:gap-6">
@@ -145,10 +153,10 @@ const RRSearchForm: FC<RRSearchFormProps> = ({
   const renderForm = () => {
     return (
       <div className="relative mt-8">
-        <RestaurantSearchForm 
-          activeTab={tabActive} 
-          defaultSearchText={defaultSearchText} 
-          defaultSearchDistance={defaultSearchDistance} 
+        <RestaurantSearchForm
+          // activeTab={tabActive} 
+          defaultSearchText={defaultSearchText}
+          defaultSearchDistance={defaultSearchDistance}
           defaultSelectedItems={defaultSelectedItems}
           defaultPropertyTypes={selectedPropertyTypes}
           onPropertyTypeChange={handlePropertyTypeChange}
