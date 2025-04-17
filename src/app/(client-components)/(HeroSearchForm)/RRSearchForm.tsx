@@ -95,13 +95,12 @@ const RRSearchForm: FC<RRSearchFormProps> = ({
               >
 
 
-                <Checkbox className="text-sm font-medium text-center whitespace-pre-line text-white "
+                <Checkbox
+                  className="text-sm font-medium text-center whitespace-pre-line text-white"
                   defaultChecked={true}
                   label={tab.displayName || tab.name}
                   name={tab.id}
-                >
-
-                </Checkbox>
+                />
 
 
               </li>
