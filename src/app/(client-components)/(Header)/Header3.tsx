@@ -13,10 +13,10 @@ interface Header3Props {
 
 const Header3: FC<Header3Props> = ({ className = "" }) => {
   const [showSearchForm, setShowSearchForm] = useState(false);
-  const [currentTab, setCurrentTab] = useState<SearchTab>("Near Me");
+  // const [currentTab, setCurrentTab] = useState<SearchTab>("Near Me");
 
   const handleShowHeroSearch = (tab: SearchTab) => {
-    setCurrentTab(tab);
+    // setCurrentTab(tab);
     setShowSearchForm(true);
   };
 
@@ -25,28 +25,28 @@ const Header3: FC<Header3Props> = ({ className = "" }) => {
   };
 
   const handleTabClick = (tab: SearchTab) => {
-    setCurrentTab(tab);
+    // setCurrentTab(tab);
     setShowSearchForm(true);
   };
 
-  const handleSearchClick = () => {
-    handleShowHeroSearch("Near Me");
+  const handleSearchClick = ()       => {
+    handleShowHeroSearch("Dine In");
   };
 
   const renderTab = () => {
     return (
       <ul className="ml-6 md:ml-10 flex space-x-4 sm:space-x-8 lg:space-x-11 overflow-x-auto hiddenScrollbar">
-        {["Near Me", "International Cuisine", "Fine Dine", "Casual Dining", "Fast Food", "Child Friendly"].map(
+        {["Dine In", "Take Away", "Child Friendly"].map(
           (tab) => {
-            const active = currentTab === tab;
+            // const active = currentTab === tab;
             return (
               <li
                 onClick={() => handleTabClick(tab as SearchTab)}
-                className={`flex-shrink-0 flex items-center cursor-pointer text-sm lg:text-base font-medium ${
-                  active
-                    ? ""
-                    : "text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-400"
-                } `}
+                // className={`flex-shrink-0 flex items-center cursor-pointer text-sm lg:text-base font-medium ${
+                //   // active
+                //   //   ? ""
+                //   //   : "text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-400"
+                // } `}
                 key={tab}
               >
                 {tab}
