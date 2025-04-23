@@ -97,7 +97,7 @@ const RRSearchForm: FC<RRSearchFormProps> = ({
                   taxonomy={{
                     id: tab.id,
                     name: tab.name,
-                    icon: <tab.icon className={`w-12 h-12 p-2 mr-1 bg-indigo-100 text-white rounded-full transition-all duration-700 ease-in-out ${
+                    icon: <tab.icon className={`w-12 h-12 p-2 mr-1 bg-indigo-100 text-indigo-600 rounded-full transition-all duration-700 ease-in-out ${
                       isSelected 
                         ? 'text-indigo-600' 
                         : 'text-indigo-600'
