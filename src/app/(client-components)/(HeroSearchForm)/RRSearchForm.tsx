@@ -79,7 +79,7 @@ const RRSearchForm: FC<RRSearchFormProps> = ({
     setSearchText(value);
   };
 
-  const renderTab = () => {
+   const renderTab = () => {
     return (
       <div className="flex flex-col items-center w-full">
         <ul className="flex justify-between items-center w-full px-2">
