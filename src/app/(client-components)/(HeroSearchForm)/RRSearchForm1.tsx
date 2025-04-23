@@ -3,7 +3,7 @@
 import React, { FC, useState } from "react";
 import StaySearchForm from "./(stay-search-form)/StaySearchForm";
 
-import RestaurantSearchForm from "./(real-estate-search-form)/RestaurantSearchForm";
+import RestaurantSearchForm1 from "./(real-estate-search-form)/RestaurantSearchForm";
 import {
   MapPinIcon,
   GlobeAsiaAustraliaIcon,
@@ -133,7 +133,7 @@ const RRSearchForm: FC<RRSearchFormProps> = ({
   const renderForm = () => {
     return (
       <div className="relative mt-8">
-        <RestaurantSearchForm
+        <RestaurantSearchForm1
           // activeTab={tabActive} 
           defaultSearchText={defaultSearchText}
           defaultSearchDistance={defaultSearchDistance}

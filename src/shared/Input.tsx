@@ -16,6 +16,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       rounded = "rounded-2xl",
       children,
       type = "text",
+      
       ...args
     },
     ref

@@ -20,6 +20,14 @@ export interface TaxonomyType {
   taxonomy: "category" | "tag";
   listingType?: "stay" | "experiences" | "car";
 }
+export interface RestaurantTypeTabs {
+  id: string | number;
+  name: string;
+  icon: React.ReactNode | StaticImageData | string | any;
+  color?: TwMainColor | string;
+  className?: string;
+  Image?: StaticImageData | string | any | React.ReactNode;
+}
 
 export interface AuthorType {
   id: string | number;

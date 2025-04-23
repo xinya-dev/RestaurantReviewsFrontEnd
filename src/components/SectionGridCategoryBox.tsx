@@ -2,6 +2,7 @@ import CardCategoryBox1 from "@/components/CardCategoryBox1";
 import Heading from "@/shared/Heading";
 import { TaxonomyType } from "@/data/types";
 import React from "react";
+import RestaurantCategories from "@/components/RestaurantCategories";
 
 export interface SectionGridCategoryBoxProps {
   categories?: TaxonomyType[];
