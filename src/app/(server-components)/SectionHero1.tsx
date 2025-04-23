@@ -52,7 +52,7 @@ const SectionHero: React.FC<SectionHeroProps> = ({ className = "" }) => {
       {/* Content */}
       <div className="relative z-10 container mx-auto">
         <div className="flex flex-col items-center justify-center">
-          <h1 className="text-4xl font-bold mb-12 text-center">What can I help with?</h1>
+          <h1 className="text-4xl font-bold mb-12 text-center">“View your meal before you order it”</h1>
           
           {/* ChatGPT-style Search Bar */}
           <div className="w-full max-w-6xl mx-auto">
