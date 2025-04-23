@@ -4,12 +4,6 @@ import React, { FC, useState, useRef, useEffect } from "react";
 import { MapPinIcon, ClockIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { Loader } from "@googlemaps/js-api-loader";
 
-declare global {
-  interface Window {
-    google: typeof google;
-  }
-}
-
 interface LocationData {
   postcode: string;
   locality: string;
@@ -19,6 +13,14 @@ interface LocationData {
 
 interface LocationSelectorProps {
   onSelect?: (locations: LocationData[]) => void;
+}
+
+interface GeocodingResult {
+  address_components?: Array<{
+    long_name: string;
+    short_name: string;
+    types: string[];
+  }>;
 }
 
 const MAX_RECENT_SEARCHES = 5;
@@ -119,14 +121,14 @@ const LocationSelector: FC<LocationSelectorProps> = ({ onSelect }) => {
             const { latitude, longitude } = position.coords;
             
             // Load Google Maps Geocoding
-            await loader.load();
-            const geocoder = new window.google.maps.Geocoder();
+            const google = await loader.load();
+            const geocoder = new google.maps.Geocoder();
             
             // Get address using Google Maps Geocoding
-            const response = await new Promise<google.maps.GeocoderResult>((resolve, reject) => {
+            const response = await new Promise<GeocodingResult>((resolve, reject) => {
               geocoder.geocode(
                 { location: { lat: latitude, lng: longitude } },
-                (results: google.maps.GeocoderResult[] | null, status: google.maps.GeocoderStatus) => {
+                (results: any[] | null, status: string) => {
                   if (status === "OK" && results && results.length > 0) {
                     resolve(results[0]);
                   } else {
@@ -140,7 +142,7 @@ const LocationSelector: FC<LocationSelectorProps> = ({ onSelect }) => {
             let locality = "", state = "", country = "", postcode = "";
 
             // Extract components from address
-            response.address_components.forEach((component: google.maps.GeocoderAddressComponent) => {
+            response.address_components?.forEach((component) => {
               const types = component.types;
               if (types.includes("locality") || types.includes("sublocality")) {
                 locality = component.long_name;
