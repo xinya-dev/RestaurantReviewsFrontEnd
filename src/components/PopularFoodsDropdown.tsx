@@ -3,6 +3,7 @@
 import React, { Fragment, useState, useRef } from "react";
 import { Popover, Transition } from "@headlessui/react";
 import { FireIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import Checkbox from "@/shared/Checkbox";
 
 interface FoodItem {
   name: string;
@@ -15,13 +16,13 @@ const popularFoods: FoodItem[] = [
   {
     name: "Biryani",
     description: "Fragrant rice dish with spices and meat",
-    checked: true,
+    checked: false,
     icon: "🍚"
   },
   {
     name: "Pasta Carbonara",
     description: "Creamy pasta with eggs and bacon",
-    checked: true,
+    checked: false,
     icon: "🍝"
   },
   {
@@ -77,58 +78,45 @@ const PopularFoodsDropdown: React.FC<PopularFoodsDropdownProps> = ({ onChange })
   const [isTooltipOpen, setIsTooltipOpen] = useState(false);
   const tooltipTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const handleFoodToggle = (foodName: string) => {
+  const handleFoodToggle = (foodName: string, isChecked: boolean) => {
     const updatedFoods = selectedFoods.map(food =>
       food.name === foodName
-        ? { ...food, checked: !food.checked }
+        ? { ...food, checked: isChecked }
         : food
     );
     setSelectedFoods(updatedFoods);
     onChange?.(updatedFoods.filter(f => f.checked).map(f => f.name));
   };
 
-  // Function to handle deselecting from tooltip
   const handleTooltipDeselect = (foodName: string, e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent closing the tooltip immediately
-    handleFoodToggle(foodName);
+    e.stopPropagation();
+    handleFoodToggle(foodName, false);
   };
 
   const handleMouseEnterButton = () => {
-    if (tooltipTimeoutRef.current) {
-      clearTimeout(tooltipTimeoutRef.current);
-    }
+    if (tooltipTimeoutRef.current) clearTimeout(tooltipTimeoutRef.current);
     setIsTooltipOpen(true);
   };
 
   const handleMouseLeaveButton = () => {
-    tooltipTimeoutRef.current = setTimeout(() => {
-      setIsTooltipOpen(false);
-    }, 150); // Small delay to allow moving to tooltip
+    tooltipTimeoutRef.current = setTimeout(() => setIsTooltipOpen(false), 150);
   };
 
   const handleMouseEnterTooltip = () => {
-    if (tooltipTimeoutRef.current) {
-      clearTimeout(tooltipTimeoutRef.current);
-    }
+    if (tooltipTimeoutRef.current) clearTimeout(tooltipTimeoutRef.current);
   };
 
   const handleMouseLeaveTooltip = () => {
-    tooltipTimeoutRef.current = setTimeout(() => {
-      setIsTooltipOpen(false);
-    }, 150);
+    tooltipTimeoutRef.current = setTimeout(() => setIsTooltipOpen(false), 150);
   };
 
   const handleSelectAll = (checked: boolean) => {
-    const updatedFoods = selectedFoods.map(food => ({
-      ...food,
-      checked
-    }));
+    const updatedFoods = selectedFoods.map(food => ({ ...food, checked }));
     setSelectedFoods(updatedFoods);
     onChange?.(checked ? updatedFoods.map(f => f.name) : []);
   };
 
   const allChecked = selectedFoods.every(f => f.checked);
-  const someChecked = selectedFoods.some(f => f.checked) && !allChecked;
   const currentlySelected = selectedFoods.filter(f => f.checked);
 
   return (
@@ -138,8 +126,8 @@ const PopularFoodsDropdown: React.FC<PopularFoodsDropdownProps> = ({ onChange })
           <Popover.Button
             onMouseEnter={handleMouseEnterButton}
             onMouseLeave={handleMouseLeaveButton}
-            className={`flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 rounded-full text-sm text-indigo-600 whitespace-nowrap transition-colors ${
-              open ? "bg-indigo-100" : ""
+            className={`flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 hover:bg-indigo-100 rounded-lg text-sm text-gray-600 whitespace-nowrap transition-colors ${
+              open ? "bg-gray-100" : ""
             }`}
           >
             <FireIcon className="w-5 h-5 stroke-2" />
@@ -190,43 +178,18 @@ const PopularFoodsDropdown: React.FC<PopularFoodsDropdownProps> = ({ onChange })
             <Popover.Panel className="fixed z-[9999] w-screen max-w-4xl px-4 mt-3 left-1/2 -translate-x-1/2 top-[200px] sm:px-0">
               <div className="overflow-hidden rounded-2xl shadow-xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700">
                 <div className="relative flex flex-col px-6 py-6 space-y-6">
-                  {/* Select All Checkbox */}
+                  {/* Select All Checkbox - Updated */}
                   <div className="flex items-center space-x-3 border-b pb-4">
-                    <button
-                      onClick={() => handleSelectAll(!allChecked)}
-                      className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                        allChecked
-                          ? "border-indigo-600 bg-indigo-600"
-                          : someChecked
-                          ? "border-indigo-600 bg-indigo-600/20"
-                          : "border-neutral-300 dark:border-neutral-600"
-                      }`}
-                    >
-                      {allChecked && (
-                        <svg
-                          className="w-3 h-3 text-white"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M5 13l4 4L19 7"
-                          />
-                        </svg>
-                      )}
-                      {someChecked && !allChecked && (
-                        <div className="w-2 h-2 bg-indigo-600 rounded-full" />
-                      )}
-                    </button>
-                    <span className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
-                      Select All Foods
-                    </span>
+                     <Checkbox
+                       name="select-all-foods"
+                       label="Select All Foods"
+                       labelClassName="text-sm font-medium text-neutral-900 dark:text-neutral-100"
+                       checked={allChecked}
+                       onChange={handleSelectAll}
+                     />
                   </div>
 
-                  {/* Three Column Grid with Scrollbar */}
+                  {/* Three Column Grid with Scrollbar - Updated */}
                   <div className="overflow-y-auto max-h-[289px] scrollbar-thin scrollbar-thumb-neutral-300 dark:scrollbar-thumb-neutral-700 scrollbar-track-transparent pr-2">
                     <div className="grid grid-cols-3 gap-x-6 gap-y-5">
                       {selectedFoods.map((food) => (
@@ -247,30 +210,12 @@ const PopularFoodsDropdown: React.FC<PopularFoodsDropdownProps> = ({ onChange })
                               </p>
                             </div>
                           </div>
-                          <button
-                            onClick={() => handleFoodToggle(food.name)}
-                            className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${
-                              food.checked
-                                ? "border-indigo-600 bg-indigo-600"
-                                : "border-neutral-300 dark:border-neutral-600 hover:border-indigo-400"
-                            }`}
-                          >
-                            {food.checked && (
-                              <svg
-                                className="w-3 h-3 text-white"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M5 13l4 4L19 7"
-                                />
-                              </svg>
-                            )}
-                          </button>
+                           <Checkbox
+                             name={food.name}
+                             className="ml-auto flex-shrink-0"
+                             checked={food.checked}
+                             onChange={(checked) => handleFoodToggle(food.name, checked)}
+                           />
                         </div>
                       ))}
                     </div>

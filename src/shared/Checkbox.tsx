@@ -1,13 +1,13 @@
 "use client";
 
-import React, { FC } from "react";
+import React, { FC, ReactNode } from "react";
 
 export interface CheckboxProps {
-  label?: string;
+  label?: ReactNode;
   subLabel?: string;
   className?: string;
   name: string;
-  defaultChecked?: boolean;
+  checked?: boolean;
   onChange?: (checked: boolean) => void;
   labelClassName?: string;
 }
@@ -17,7 +17,7 @@ const Checkbox: FC<CheckboxProps> = ({
   label = "",
   name,
   className = "",
-  defaultChecked,
+  checked = false,
   onChange,
   labelClassName = "",
 }) => {
@@ -28,7 +28,7 @@ const Checkbox: FC<CheckboxProps> = ({
         name={name}
         type="checkbox"
         className="focus:ring-action-primary h-6 w-6 text-primary-500 border-primary rounded border-neutral-500 bg-white dark:bg-neutral-700  dark:checked:bg-primary-500 focus:ring-primary-500 "
-        defaultChecked={defaultChecked}
+        checked={checked}
         onChange={(e) => onChange && onChange(e.target.checked)}
       />
       {label && (

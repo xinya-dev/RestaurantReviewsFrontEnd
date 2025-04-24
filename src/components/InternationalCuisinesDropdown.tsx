@@ -1,9 +1,10 @@
 "use client";
 
-import React, { Fragment, useState, useRef } from "react";
+import React, { Fragment, useState, useRef, useEffect } from "react";
 import { Popover, Transition } from "@headlessui/react";
 import { GlobeAltIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import Image from "next/image";
+import Checkbox from "@/shared/Checkbox";
 
 interface CuisineItem {
   name: string;
@@ -92,125 +93,125 @@ const cuisines: CuisineItem[] = [
   {
     name: "Australian",
     description: "Modern Australian and Indigenous cuisine",
-    checked: true,
+    checked: false,
     flagCode: "au",
 
   },
   {
     name: "Italian",
     description: "Pizza, Pasta, and Mediterranean flavors",
-    checked: true,
+    checked: false,
     flagCode: "it",
     
   },
   {
     name: "Thai",
     description: "Authentic Thai dishes and street food",
-    checked: true,
+    checked: false,
     flagCode: "th",
     
   },
   {
     name: "Indian",
     description: "Traditional Indian curries and tandoor",
-    checked: true,
+    checked: false,
     flagCode: "in",
     
   },
   {
     name: "Chinese",
     description: "Regional Chinese specialties",
-    checked: true,
+    checked: false,
     flagCode: "cn",
     
   },
   {
     name: "Greek",
     description: "Mediterranean Greek delicacies",
-    checked: true,
+    checked: false,
     flagCode: "gr",
 
   },
   {
     name: "American",
     description: "Classic American comfort food",
-    checked: true,
+    checked: false,
     flagCode: "us",
 
   },
   {
     name: "English",
     description: "Traditional British cuisine",
-    checked: true,
+    checked: false,
     flagCode: "gb",
   },
   {
     name: "Japanese",
     description: "Sushi, Ramen, and Japanese dishes",
-    checked: true,
+    checked: false,
     flagCode: "jp",
     
   },
   {
     name: "Vietnamese",
     description: "Authentic Vietnamese street food",
-    checked: true,
+    checked: false,
     flagCode: "vn",
     
   },
   {
     name: "Mexican",
     description: "Traditional Mexican flavors",
-    checked: true,
+    checked: false,
     flagCode: "mx",
     
   },
   {
     name: "French",
     description: "Classic French cuisine",
-    checked: true,
+    checked: false,
     flagCode: "fr",
    
   },
   {
     name: "Spanish",
     description: "Spanish tapas and paella",
-    checked: true,
+    checked: false,
     flagCode: "es",
    
   },
   {
     name: "Indonesian",
     description: "Traditional Indonesian dishes",
-    checked: true,
+    checked: false,
     flagCode: "id",
 
   },
   {
     name: "Philippines",
     description: "Filipino specialties",
-    checked: true,
+    checked: false,
     flagCode: "ph",
     
   },
   {
     name: "Middle Eastern",
     description: "Middle Eastern delicacies",
-    checked: true,
+    checked: false,
     flagCode: "ae",
   
   },
   {
     name: "Singapore",
     description: "Singapore's diverse cuisine",
-    checked: true,
+    checked: false,
     flagCode: "sg",
   
   },
   {
     name: "Arab",
     description: "Traditional Arab cuisine",
-    checked: true,
+    checked: false,
     flagCode: "sa",
     
   }
@@ -225,20 +226,31 @@ const InternationalCuisinesDropdown: React.FC<InternationalCuisinesDropdownProps
   const [isTooltipOpen, setIsTooltipOpen] = useState(false);
   const tooltipTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const handleCuisineToggle = (cuisineName: string) => {
-    const updatedCuisines = selectedCuisines.map(cuisine =>
-      cuisine.name === cuisineName
-        ? { ...cuisine, checked: !cuisine.checked }
-        : cuisine
+  useEffect(() => {
+    const selectedNames = selectedCuisines.filter(c => c.checked).map(c => c.name);
+    onChange?.(selectedNames);
+  }, [selectedCuisines, onChange]);
+
+  const handleSelectAll = (checked: boolean) => {
+    setSelectedCuisines((prevCuisines) =>
+      prevCuisines.map((cuisine) => ({
+        ...cuisine,
+        checked: checked,
+      }))
     );
-    setSelectedCuisines(updatedCuisines);
-    onChange?.(updatedCuisines.filter(c => c.checked).map(c => c.name));
   };
 
-  // Function to handle deselecting from tooltip
+  const handleCuisineToggle = (name: string, checked: boolean) => {
+    setSelectedCuisines((prevCuisines) =>
+      prevCuisines.map((cuisine) =>
+        cuisine.name === name ? { ...cuisine, checked } : cuisine
+      )
+    );
+  };
+
   const handleTooltipDeselect = (cuisineName: string, e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent closing the tooltip immediately
-    handleCuisineToggle(cuisineName);
+    e.stopPropagation();
+    handleCuisineToggle(cuisineName, false);
   };
 
   const handleMouseEnterButton = () => {
@@ -251,7 +263,7 @@ const InternationalCuisinesDropdown: React.FC<InternationalCuisinesDropdownProps
   const handleMouseLeaveButton = () => {
     tooltipTimeoutRef.current = setTimeout(() => {
       setIsTooltipOpen(false);
-    }, 150); // Small delay to allow moving to tooltip
+    }, 150);
   };
 
   const handleMouseEnterTooltip = () => {
@@ -266,17 +278,7 @@ const InternationalCuisinesDropdown: React.FC<InternationalCuisinesDropdownProps
     }, 150);
   };
 
-  const handleSelectAll = (checked: boolean) => {
-    const updatedCuisines = selectedCuisines.map(cuisine => ({
-      ...cuisine,
-      checked
-    }));
-    setSelectedCuisines(updatedCuisines);
-    onChange?.(checked ? updatedCuisines.map(c => c.name) : []);
-  };
-
   const allChecked = selectedCuisines.every(c => c.checked);
-  const someChecked = selectedCuisines.some(c => c.checked) && !allChecked;
   const currentlySelected = selectedCuisines.filter(c => c.checked);
 
   return (
@@ -286,8 +288,8 @@ const InternationalCuisinesDropdown: React.FC<InternationalCuisinesDropdownProps
           <Popover.Button
             onMouseEnter={handleMouseEnterButton}
             onMouseLeave={handleMouseLeaveButton}
-            className={`flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 rounded-full text-sm text-indigo-600 whitespace-nowrap transition-colors ${
-              open ? "bg-indigo-100" : ""
+            className={`flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 hover:bg-indigo-100 rounded-lg text-sm text-gray-600 whitespace-nowrap transition-colors ${
+              open ? "bg-gray-100" : ""
             }`}
           >
             <GlobeAltIcon className="w-5 h-5 stroke-2" />
@@ -327,7 +329,7 @@ const InternationalCuisinesDropdown: React.FC<InternationalCuisinesDropdownProps
 
           <Transition
             as={Fragment}
-            show={open} // Control transition based on Popover's open state
+            show={open}
             enter="transition ease-out duration-200"
             enterFrom="opacity-0 translate-y-1"
             enterTo="opacity-100 translate-y-0"
@@ -340,38 +342,13 @@ const InternationalCuisinesDropdown: React.FC<InternationalCuisinesDropdownProps
                 <div className="relative flex flex-col px-6 py-6 space-y-6">
                   {/* Select All Checkbox */}
                   <div className="flex items-center space-x-3 border-b pb-4">
-                    <button
-                      onClick={() => handleSelectAll(!allChecked)}
-                      className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                        allChecked
-                          ? "border-indigo-600 bg-indigo-600"
-                          : someChecked
-                          ? "border-indigo-600 bg-indigo-600/20"
-                          : "border-neutral-300 dark:border-neutral-600"
-                      }`}
-                    >
-                      {allChecked && (
-                        <svg
-                          className="w-3 h-3 text-white"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M5 13l4 4L19 7"
-                          />
-                        </svg>
-                      )}
-                      {someChecked && !allChecked && (
-                        <div className="w-2 h-2 bg-indigo-600 rounded-full" />
-                      )}
-                    </button>
-                    <span className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
-                      Select All Cuisines
-                    </span>
+                     <Checkbox
+                       name="select-all-cuisines"
+                       label="Select All Cuisines"
+                       labelClassName="text-sm font-medium text-neutral-900 dark:text-neutral-100"
+                       checked={allChecked}
+                       onChange={(checked) => handleSelectAll(checked)}
+                     />
                   </div>
 
                   {/* Three Column Grid with Scrollbar */}
@@ -400,30 +377,12 @@ const InternationalCuisinesDropdown: React.FC<InternationalCuisinesDropdownProps
                               </p>
                             </div>
                           </div>
-                          <button
-                            onClick={() => handleCuisineToggle(cuisine.name)}
-                            className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${
-                              cuisine.checked
-                                ? "border-indigo-600 bg-indigo-600"
-                                : "border-neutral-300 dark:border-neutral-600 hover:border-indigo-400"
-                            }`}
-                          >
-                            {cuisine.checked && (
-                              <svg
-                                className="w-3 h-3 text-white"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M5 13l4 4L19 7"
-                                />
-                              </svg>
-                            )}
-                          </button>
+                          <Checkbox
+                            name={cuisine.name}
+                            className="ml-auto flex-shrink-0"
+                            checked={cuisine.checked}
+                            onChange={(checked) => handleCuisineToggle(cuisine.name, checked)}
+                          />
                         </div>
                       ))}
                     </div>

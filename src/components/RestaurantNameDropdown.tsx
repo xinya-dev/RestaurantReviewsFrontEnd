@@ -3,6 +3,7 @@
 import React, { FC, useState, useRef, useEffect, Fragment } from "react";
 import { MagnifyingGlassIcon, ClockIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { Popover, Transition } from "@headlessui/react";
+import Checkbox from "@/shared/Checkbox";
 
 interface Restaurant {
   name: string;
@@ -45,9 +46,14 @@ const RestaurantNameDropdown: FC<RestaurantNameDropdownProps> = ({ onChange }) =
   useEffect(() => {
     const savedRecent = localStorage.getItem('recentRestaurantSearches');
     if (savedRecent) {
-      setRecentSearches(JSON.parse(savedRecent));
+      const parsedRecent = JSON.parse(savedRecent) as Restaurant[];
+      const updatedRecent = parsedRecent.map(rec => ({
+        ...rec,
+        checked: selectedRestaurants.some(sel => sel.name === rec.name)
+      }));
+      setRecentSearches(updatedRecent);
     }
-  }, []);
+  }, [selectedRestaurants]);
 
   // Handle click outside
   useEffect(() => {
@@ -71,80 +77,66 @@ const RestaurantNameDropdown: FC<RestaurantNameDropdownProps> = ({ onChange }) =
   useEffect(() => {
     if (searchValue.trim()) {
       const searchTerm = searchValue.toLowerCase().trim();
-      const filtered = sampleRestaurants.map(restaurant => ({
-        ...restaurant,
-        checked: selectedRestaurants.some(r => r.name === restaurant.name)
-      })).filter(restaurant => 
+      const filtered = sampleRestaurants.filter(restaurant =>
         restaurant.name.toLowerCase().includes(searchTerm) ||
         restaurant.cuisine.toLowerCase().includes(searchTerm)
       );
-      setFilteredRestaurants(filtered.slice(0, 10));
+       // Add checked state to filtered results
+       const checkedFiltered = filtered.map(res => ({
+         ...res,
+         checked: selectedRestaurants.some(sel => sel.name === res.name)
+       }));
+      setFilteredRestaurants(checkedFiltered.slice(0, 10));
     } else {
       setFilteredRestaurants([]);
     }
   }, [searchValue, selectedRestaurants]);
 
-  const handleRestaurantToggle = (restaurant: Restaurant) => {
-    const isSelected = selectedRestaurants.some(r => r.name === restaurant.name);
-    let newSelected;
+  const handleRestaurantToggle = (restaurantName: string, isChecked: boolean) => {
+     const targetRestaurant = sampleRestaurants.find(r => r.name === restaurantName) || recentSearches.find(r => r.name === restaurantName);
+     if (!targetRestaurant) return;
 
-    if (isSelected) {
-      newSelected = selectedRestaurants.filter(r => r.name !== restaurant.name);
-    } else {
-      newSelected = [...selectedRestaurants, { ...restaurant, checked: true }];
-    }
+     let newSelected;
+     if (isChecked) {
+       newSelected = [...selectedRestaurants, { ...targetRestaurant, checked: true }];
+     } else {
+       newSelected = selectedRestaurants.filter(r => r.name !== restaurantName);
+     }
+     setSelectedRestaurants(newSelected);
 
-    setSelectedRestaurants(newSelected);
-
-    // Update recent searches (only add if not already selected)
-    if (!isSelected) {
-       const newRecent = [restaurant, ...recentSearches.filter(item => 
-         item.name !== restaurant.name
-       )].slice(0, MAX_RECENT_SEARCHES);
+     // Update recent searches (only add if selecting)
+     if (isChecked) {
+       const newRecent = [targetRestaurant, ...recentSearches.filter(item => item.name !== restaurantName)].slice(0, MAX_RECENT_SEARCHES);
        setRecentSearches(newRecent);
        localStorage.setItem('recentRestaurantSearches', JSON.stringify(newRecent));
-    }
+     }
 
-    if (onChange) {
-      onChange(newSelected);
-    }
+     onChange?.(newSelected);
   };
 
-  // Function to handle deselecting from tooltip
   const handleTooltipDeselect = (restaurantName: string, e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent closing the tooltip immediately
-    const restaurantToToggle = selectedRestaurants.find(r => r.name === restaurantName);
-    if (restaurantToToggle) {
-      handleRestaurantToggle(restaurantToToggle);
-    }
+    e.stopPropagation();
+    handleRestaurantToggle(restaurantName, false);
   };
 
   const handleMouseEnterButton = () => {
-    if (tooltipTimeoutRef.current) {
-      clearTimeout(tooltipTimeoutRef.current);
-    }
+    if (tooltipTimeoutRef.current) clearTimeout(tooltipTimeoutRef.current);
     setIsTooltipOpen(true);
   };
 
   const handleMouseLeaveButton = () => {
-    tooltipTimeoutRef.current = setTimeout(() => {
-      setIsTooltipOpen(false);
-    }, 150); // Small delay to allow moving to tooltip
+    tooltipTimeoutRef.current = setTimeout(() => setIsTooltipOpen(false), 150);
   };
 
   const handleMouseEnterTooltip = () => {
-    if (tooltipTimeoutRef.current) {
-      clearTimeout(tooltipTimeoutRef.current);
-    }
+    if (tooltipTimeoutRef.current) clearTimeout(tooltipTimeoutRef.current);
   };
 
   const handleMouseLeaveTooltip = () => {
-    tooltipTimeoutRef.current = setTimeout(() => {
-      setIsTooltipOpen(false);
-    }, 150);
+    tooltipTimeoutRef.current = setTimeout(() => setIsTooltipOpen(false), 150);
   };
 
-  const currentlySelected = selectedRestaurants; // Already have this state
+  const currentlySelected = selectedRestaurants;
 
   return (
     <Popover ref={containerRef} className="relative">
@@ -153,7 +145,7 @@ const RestaurantNameDropdown: FC<RestaurantNameDropdownProps> = ({ onChange }) =
           <Popover.Button
             onMouseEnter={handleMouseEnterButton}
             onMouseLeave={handleMouseLeaveButton}
-            className={`flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 rounded-full text-sm text-indigo-600 whitespace-nowrap transition-colors ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 hover:bg-indigo-100 rounded-lg text-sm text-gray-600 whitespace-nowrap transition-colors ${
               open ? "bg-indigo-100" : ""
             }`}
           >
@@ -226,7 +218,7 @@ const RestaurantNameDropdown: FC<RestaurantNameDropdownProps> = ({ onChange }) =
                                className="w-3 h-3 ml-1 cursor-pointer hover:text-indigo-900"
                                onClick={(e) => {
                                  e.stopPropagation();
-                                 handleRestaurantToggle(restaurant);
+                                 handleRestaurantToggle(restaurant.name, false);
                                }}
                              />
                            </span>
@@ -245,39 +237,25 @@ const RestaurantNameDropdown: FC<RestaurantNameDropdownProps> = ({ onChange }) =
                              <div
                                key={restaurant.name}
                                className="flex items-center justify-between p-2 hover:bg-neutral-50 dark:hover:bg-neutral-800 rounded-lg transition-colors cursor-pointer"
-                               onClick={() => handleRestaurantToggle(restaurant)}
                              >
-                               <div>
-                                 <div className="text-sm font-medium text-neutral-900 dark:text-neutral-100">{restaurant.name}</div>
-                                 <div className="text-xs text-neutral-500">{restaurant.cuisine}</div>
-                                 {restaurant.rating && (
-                                   <div className="flex items-center gap-1 mt-1">
-                                     <span className="text-xs font-medium text-yellow-500">★</span>
-                                     <span className="text-xs text-neutral-600">{restaurant.rating}</span>
+                               <Checkbox
+                                 name={restaurant.name}
+                                 className="ml-auto flex-shrink-0"
+                                 checked={selectedRestaurants.some(r => r.name === restaurant.name)}
+                                 onChange={(checked) => handleRestaurantToggle(restaurant.name, checked)}
+                                 label={(
+                                   <div className="flex flex-col">
+                                     <div className="text-sm font-medium text-neutral-900 dark:text-neutral-100 truncate" title={restaurant.name}>{restaurant.name}</div>
+                                     <div className="text-xs text-neutral-500 truncate" title={restaurant.cuisine}>{restaurant.cuisine}</div>
+                                     {restaurant.rating && (
+                                       <div className="flex items-center gap-1 mt-0.5">
+                                         <span className="text-xs font-medium text-yellow-500">★</span>
+                                         <span className="text-xs text-neutral-600">{restaurant.rating}</span>
+                                       </div>
+                                     )}
                                    </div>
-                                 )}
-                               </div>
-                               <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors flex-shrink-0 ${
-                                 selectedRestaurants.some(r => r.name === restaurant.name)
-                                   ? "border-indigo-600 bg-indigo-600"
-                                   : "border-neutral-300 hover:border-indigo-400"
-                               }`}>
-                                 {selectedRestaurants.some(r => r.name === restaurant.name) && (
-                                   <svg
-                                     className="w-3 h-3 text-white"
-                                     fill="none"
-                                     viewBox="0 0 24 24"
-                                     stroke="currentColor"
-                                   >
-                                     <path
-                                       strokeLinecap="round"
-                                       strokeLinejoin="round"
-                                       strokeWidth={2}
-                                       d="M5 13l4 4L19 7"
-                                     />
-                                   </svg>
-                                 )}
-                               </div>
+                                 )} labelClassName="text-sm font-medium text-neutral-900 dark:text-neutral-100"
+                               />
                              </div>
                            ))}
                          </div>
@@ -293,36 +271,28 @@ const RestaurantNameDropdown: FC<RestaurantNameDropdownProps> = ({ onChange }) =
                              <div
                                key={`recent-${restaurant.name}`}
                                className="flex items-center justify-between p-2 hover:bg-neutral-50 dark:hover:bg-neutral-800 rounded-lg transition-colors cursor-pointer"
-                               onClick={() => handleRestaurantToggle(restaurant)}
                              >
-                               <div className="flex items-center gap-2">
-                                 <ClockIcon className="w-4 h-4 text-neutral-400" />
-                                 <div>
-                                   <div className="text-sm font-medium text-neutral-900 dark:text-neutral-100">{restaurant.name}</div>
-                                   <div className="text-xs text-neutral-500">{restaurant.cuisine}</div>
-                                 </div>
-                               </div>
-                               <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors flex-shrink-0 ${
-                                 selectedRestaurants.some(r => r.name === restaurant.name)
-                                   ? "border-indigo-600 bg-indigo-600"
-                                   : "border-neutral-300 hover:border-indigo-400"
-                               }`}>
-                                 {selectedRestaurants.some(r => r.name === restaurant.name) && (
-                                   <svg
-                                     className="w-3 h-3 text-white"
-                                     fill="none"
-                                     viewBox="0 0 24 24"
-                                     stroke="currentColor"
-                                   >
-                                     <path
-                                       strokeLinecap="round"
-                                       strokeLinejoin="round"
-                                       strokeWidth={2}
-                                       d="M5 13l4 4L19 7"
-                                     />
-                                   </svg>
-                                 )}
-                               </div>
+                               <Checkbox
+                                 name={`recent-${restaurant.name}`}
+                                 className="ml-auto flex-shrink-0"
+                                 checked={selectedRestaurants.some(r => r.name === restaurant.name)}
+                                 onChange={(checked) => handleRestaurantToggle(restaurant.name, checked)}
+                                 label={(
+                                   <div className="flex items-center gap-2">
+                                     <ClockIcon className="w-4 h-4 text-neutral-400 flex-shrink-0" />
+                                     <div className="flex-1 min-w-0">
+                                       <div className="text-sm font-medium text-neutral-900 dark:text-neutral-100 truncate" title={restaurant.name}>{restaurant.name}</div>
+                                       <div className="text-xs text-neutral-500 truncate" title={restaurant.cuisine}>{restaurant.cuisine}</div>
+                                       {restaurant.rating && (
+                                         <div className="flex items-center gap-1 mt-0.5">
+                                           <span className="text-xs font-medium text-yellow-500">★</span>
+                                           <span className="text-xs text-neutral-600">{restaurant.rating}</span>
+                                         </div>
+                                       )}
+                                     </div>
+                                   </div>
+                                 )} labelClassName="text-sm font-medium text-neutral-900 dark:text-neutral-100"
+                               />
                              </div>
                            ))}
                          </div>
@@ -343,6 +313,9 @@ const RestaurantNameDropdown: FC<RestaurantNameDropdownProps> = ({ onChange }) =
                    <button
                      onClick={() => {
                        setSelectedRestaurants([]);
+                       const updatedRecent = recentSearches.map(r => ({...r, checked: false}));
+                       setRecentSearches(updatedRecent);
+                       if (!searchValue) setFilteredRestaurants([]);
                        onChange?.([]);
                      }}
                      className="px-4 py-2 text-sm font-medium text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg transition-colors"

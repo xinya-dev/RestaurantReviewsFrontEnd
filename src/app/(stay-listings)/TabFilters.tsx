@@ -340,9 +340,8 @@ const TabFilters: FC<TabFiltersProps> = ({ className = "", page = "stay" }) => {
               key={item.name}
               name={item.name}
               label={item.name}
-              className="text-primary-500"
-              // labelClassName="text-primary-500"
-              defaultChecked={!!item.defaultChecked}
+              className="bg-neutral-50 dark:bg-neutral-800"
+              checked={!!item.defaultChecked}
             />
           ))}
         </div>
@@ -352,9 +351,8 @@ const TabFilters: FC<TabFiltersProps> = ({ className = "", page = "stay" }) => {
               key={item.name}
               name={item.name}
               label={item.name}
-              className="text-primary-500"
-              // labelClassName="text-primary-500"
-              defaultChecked={!!item.defaultChecked}
+              className="bg-neutral-50 dark:bg-neutral-800"
+              checked={!!item.defaultChecked}
             />
           ))}
         </div>

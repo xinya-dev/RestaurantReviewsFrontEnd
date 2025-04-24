@@ -4,6 +4,7 @@ import React, { Fragment, useState, useRef } from "react";
 import { Popover, Transition } from "@headlessui/react";
 import { BuildingStorefrontIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import Image from "next/image";
+import Checkbox from "@/shared/Checkbox";
 
 interface RestaurantTypeItem {
   name: string;
@@ -15,97 +16,97 @@ const restaurantTypes: RestaurantTypeItem[] = [
   {
     name: "All",
     description: "All types of restaurants",
-    checked: true,
+    checked: false,
   },
   {
     name: "Family Restaurant",
     description: "Kid-friendly, casual with larger portions.",
-    checked: true,
+    checked: false,
   },
   {
     name: "Fine Dining",
     description: "High-end, full-service with premium menu and elegant ambiance ideal for romantic dinners.",
-    checked: true,
+    checked: false,
   },
   {
     name: "Casual Dining",
     description: "Sit-down service with moderate pricing and varied menu.",
-    checked: true,
+    checked: false,
   },
   {
     name: "Fast Casual",
     description: "Higher quality than fast food, no table service.",
-    checked: true,
+    checked: false,
   },
   {
     name: "Fast Food",
     description: "Quick service, often drive-thru or takeaway focused.",
-    checked: true,
+    checked: false,
   },
   {
     name: "Café / Coffee Shop",
     description: "Light meals, coffee, pastries, relaxed setting.",
-    checked: true,
+    checked: false,
   },
   {
     name: "Buffet",
     description: "All-you-can-eat or self-service restaurant.",
-    checked: true,
+    checked: false,
   },
   {
     name: "Food Truck",
     description: "Mobile kitchen offering niche or gourmet street food.",
-    checked: true,
+    checked: false,
   },
   {
     name: "Steakhouse",
     description: "Specializes in beef and grilled meats.",
-    checked: true,
+    checked: false,
   },
   {
     name: "Seafood Restaurant",
     description: "Focuses on fish, oysters, and other seafood dishes.",
-    checked: true,
+    checked: false,
   },
   {
     name: "Healthy / Vegan / Vegetarian",
     description: "Offers only plant-based or vegetarian meals.",
-    checked: true,
+    checked: false,
   },
   {
     name: "Dessert Bar",
     description: "Focus on sweets — gelato, cakes, pancakes, etc.",
-    checked: true,
+    checked: false,
   },
   {
     name: "Breakfast / Brunch",
     description: "Serves morning and mid-day meals.",
-    checked: true,
+    checked: false,
   },
   {
     name: "Tapas / Small Plates",
     description: "Share-style small dishes.",
-    checked: true,
+    checked: false,
   },
   {
     name: "Bar & Grill / Gastropub",
     description: "Upscale pub-style food with alcohol.",
-    checked: true,
+    checked: false,
   },
   {
     name: "Take Away",
     description: "Takeout focused restaurant",
-    checked: true,
+    checked: false,
   },
   {
     name: "Dinner & Drinks",
     description: "Evening dining with beverage service",
-    checked: true,
+    checked: false,
   },
   {
     name: "Bars & Clubs",
     description: "Nightlife venues with food service",
-    checked: true,
+    checked: false,
   }
 ];
 
@@ -118,58 +119,45 @@ const RestaurantTypeDropdown: React.FC<RestaurantTypeDropdownProps> = ({ onChang
   const [isTooltipOpen, setIsTooltipOpen] = useState(false);
   const tooltipTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const handleTypeToggle = (typeName: string) => {
+  const handleTypeToggle = (typeName: string, isChecked: boolean) => {
     const updatedTypes = selectedTypes.map(type =>
       type.name === typeName
-        ? { ...type, checked: !type.checked }
+        ? { ...type, checked: isChecked }
         : type
     );
     setSelectedTypes(updatedTypes);
     onChange?.(updatedTypes.filter(t => t.checked).map(t => t.name));
   };
 
-  // Function to handle deselecting from tooltip
   const handleTooltipDeselect = (typeName: string, e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent closing the tooltip immediately
-    handleTypeToggle(typeName);
+    e.stopPropagation();
+    handleTypeToggle(typeName, false);
   };
 
   const handleMouseEnterButton = () => {
-    if (tooltipTimeoutRef.current) {
-      clearTimeout(tooltipTimeoutRef.current);
-    }
+    if (tooltipTimeoutRef.current) clearTimeout(tooltipTimeoutRef.current);
     setIsTooltipOpen(true);
   };
 
   const handleMouseLeaveButton = () => {
-    tooltipTimeoutRef.current = setTimeout(() => {
-      setIsTooltipOpen(false);
-    }, 150); // Small delay to allow moving to tooltip
+    tooltipTimeoutRef.current = setTimeout(() => setIsTooltipOpen(false), 150);
   };
 
   const handleMouseEnterTooltip = () => {
-    if (tooltipTimeoutRef.current) {
-      clearTimeout(tooltipTimeoutRef.current);
-    }
+    if (tooltipTimeoutRef.current) clearTimeout(tooltipTimeoutRef.current);
   };
 
   const handleMouseLeaveTooltip = () => {
-    tooltipTimeoutRef.current = setTimeout(() => {
-      setIsTooltipOpen(false);
-    }, 150);
+    tooltipTimeoutRef.current = setTimeout(() => setIsTooltipOpen(false), 150);
   };
 
   const handleSelectAll = (checked: boolean) => {
-    const updatedTypes = selectedTypes.map(type => ({
-      ...type,
-      checked
-    }));
+    const updatedTypes = selectedTypes.map(type => ({ ...type, checked }));
     setSelectedTypes(updatedTypes);
     onChange?.(checked ? updatedTypes.map(t => t.name) : []);
   };
 
   const allChecked = selectedTypes.every(t => t.checked);
-  const someChecked = selectedTypes.some(t => t.checked) && !allChecked;
   const currentlySelected = selectedTypes.filter(t => t.checked);
 
   return (
@@ -179,8 +167,8 @@ const RestaurantTypeDropdown: React.FC<RestaurantTypeDropdownProps> = ({ onChang
           <Popover.Button
             onMouseEnter={handleMouseEnterButton}
             onMouseLeave={handleMouseLeaveButton}
-            className={`flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 rounded-full text-sm text-indigo-600 whitespace-nowrap transition-colors ${
-              open ? "bg-indigo-100" : ""
+            className={`flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 hover:bg-indigo-100 rounded-lg text-sm text-gray-600 whitespace-nowrap transition-colors ${
+              open ? "bg-gray-100" : ""
             }`}
           >
             <BuildingStorefrontIcon className="w-5 h-5 stroke-2" />
@@ -228,43 +216,18 @@ const RestaurantTypeDropdown: React.FC<RestaurantTypeDropdownProps> = ({ onChang
             <Popover.Panel className="fixed z-[9999] w-screen max-w-4xl px-4 mt-3 left-1/2 -translate-x-1/2 top-[200px] sm:px-0">
               <div className="overflow-hidden rounded-2xl shadow-xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700">
                 <div className="relative flex flex-col px-6 py-6 space-y-6">
-                  {/* Select All Checkbox */}
+                  {/* Select All Checkbox - Updated */}
                   <div className="flex items-center space-x-3 border-b pb-4">
-                    <button
-                      onClick={() => handleSelectAll(!allChecked)}
-                      className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                        allChecked
-                          ? "border-indigo-600 bg-indigo-600"
-                          : someChecked
-                          ? "border-indigo-600 bg-indigo-600/20"
-                          : "border-neutral-300 dark:border-neutral-600"
-                      }`}
-                    >
-                      {allChecked && (
-                        <svg
-                          className="w-3 h-3 text-white"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M5 13l4 4L19 7"
-                          />
-                        </svg>
-                      )}
-                      {someChecked && !allChecked && (
-                        <div className="w-2 h-2 bg-indigo-600 rounded-full" />
-                      )}
-                    </button>
-                    <span className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
-                      Select All Types
-                    </span>
+                    <Checkbox
+                      name="select-all-types"
+                      label="Select All Types"
+                      labelClassName="text-sm font-medium text-neutral-900 dark:text-neutral-100"
+                      checked={allChecked}
+                      onChange={handleSelectAll}
+                    />
                   </div>
 
-                  {/* Three Column Grid with Scrollbar */}
+                  {/* Three Column Grid with Scrollbar - Updated */}
                   <div className="overflow-y-auto max-h-[289px] scrollbar-thin scrollbar-thumb-neutral-300 dark:scrollbar-thumb-neutral-700 scrollbar-track-transparent pr-2">
                     <div className="grid grid-cols-3 gap-x-6 gap-y-5">
                       {selectedTypes.map((type) => (
@@ -273,10 +236,9 @@ const RestaurantTypeDropdown: React.FC<RestaurantTypeDropdownProps> = ({ onChang
                           className="flex items-center justify-between p-2 hover:bg-neutral-50 dark:hover:bg-neutral-800 rounded-lg transition-colors"
                         >
                           <div className="flex items-center space-x-3">
-                            <div className="relative w-10 h-7 rounded overflow-hidden shadow-sm bg-neutral-100 dark:bg-neutral-700 flex items-center justify-center text-neutral-400 text-xs">
-                              {/* Placeholder for image/icon if available */}
-                              {type.name.substring(0, 2)}
-                            </div>
+                             <div className="relative w-10 h-7 rounded overflow-hidden shadow-sm bg-neutral-100 dark:bg-neutral-700 flex items-center justify-center text-neutral-400 text-xs">
+                               {type.name.substring(0, 2)}
+                             </div>
                             <div>
                               <h3 className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
                                 {type.name}
@@ -286,30 +248,12 @@ const RestaurantTypeDropdown: React.FC<RestaurantTypeDropdownProps> = ({ onChang
                               </p>
                             </div>
                           </div>
-                          <button
-                            onClick={() => handleTypeToggle(type.name)}
-                            className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${
-                              type.checked
-                                ? "border-indigo-600 bg-indigo-600"
-                                : "border-neutral-300 dark:border-neutral-600 hover:border-indigo-400"
-                            }`}
-                          >
-                            {type.checked && (
-                              <svg
-                                className="w-3 h-3 text-white"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M5 13l4 4L19 7"
-                                />
-                              </svg>
-                            )}
-                          </button>
+                          <Checkbox
+                            name={type.name}
+                            className="ml-auto flex-shrink-0"
+                            checked={type.checked}
+                            onChange={(checked) => handleTypeToggle(type.name, checked)}
+                          />
                         </div>
                       ))}
                     </div>

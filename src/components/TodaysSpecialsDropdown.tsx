@@ -3,6 +3,7 @@
 import React, { Fragment, useState, useRef } from "react";
 import { Popover, Transition } from "@headlessui/react";
 import { CurrencyDollarIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import Checkbox from "@/shared/Checkbox";
 
 interface SpecialItem {
   name: string;
@@ -87,58 +88,45 @@ const TodaysSpecialsDropdown: React.FC<TodaysSpecialsDropdownProps> = ({ onChang
   const [isTooltipOpen, setIsTooltipOpen] = useState(false);
   const tooltipTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const handleSpecialToggle = (specialName: string) => {
+  const handleSpecialToggle = (specialName: string, isChecked: boolean) => {
     const updatedSpecials = selectedSpecials.map(special =>
       special.name === specialName
-        ? { ...special, checked: !special.checked }
+        ? { ...special, checked: isChecked }
         : special
     );
     setSelectedSpecials(updatedSpecials);
     onChange?.(updatedSpecials.filter(s => s.checked).map(s => s.name));
   };
 
-  // Function to handle deselecting from tooltip
   const handleTooltipDeselect = (specialName: string, e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent closing the tooltip immediately
-    handleSpecialToggle(specialName);
+    e.stopPropagation();
+    handleSpecialToggle(specialName, false);
   };
 
   const handleMouseEnterButton = () => {
-    if (tooltipTimeoutRef.current) {
-      clearTimeout(tooltipTimeoutRef.current);
-    }
+    if (tooltipTimeoutRef.current) clearTimeout(tooltipTimeoutRef.current);
     setIsTooltipOpen(true);
   };
 
   const handleMouseLeaveButton = () => {
-    tooltipTimeoutRef.current = setTimeout(() => {
-      setIsTooltipOpen(false);
-    }, 150); // Small delay to allow moving to tooltip
+    tooltipTimeoutRef.current = setTimeout(() => setIsTooltipOpen(false), 150);
   };
 
   const handleMouseEnterTooltip = () => {
-    if (tooltipTimeoutRef.current) {
-      clearTimeout(tooltipTimeoutRef.current);
-    }
+    if (tooltipTimeoutRef.current) clearTimeout(tooltipTimeoutRef.current);
   };
 
   const handleMouseLeaveTooltip = () => {
-    tooltipTimeoutRef.current = setTimeout(() => {
-      setIsTooltipOpen(false);
-    }, 150);
+    tooltipTimeoutRef.current = setTimeout(() => setIsTooltipOpen(false), 150);
   };
 
   const handleSelectAll = (checked: boolean) => {
-    const updatedSpecials = selectedSpecials.map(special => ({
-      ...special,
-      checked
-    }));
+    const updatedSpecials = selectedSpecials.map(special => ({ ...special, checked }));
     setSelectedSpecials(updatedSpecials);
     onChange?.(checked ? updatedSpecials.map(s => s.name) : []);
   };
 
   const allChecked = selectedSpecials.every(s => s.checked);
-  const someChecked = selectedSpecials.some(s => s.checked) && !allChecked;
   const currentlySelected = selectedSpecials.filter(s => s.checked);
 
   return (
@@ -148,7 +136,7 @@ const TodaysSpecialsDropdown: React.FC<TodaysSpecialsDropdownProps> = ({ onChang
           <Popover.Button
             onMouseEnter={handleMouseEnterButton}
             onMouseLeave={handleMouseLeaveButton}
-            className={`flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 rounded-full text-sm text-indigo-600 whitespace-nowrap transition-colors ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 hover:bg-indigo-100 rounded-lg text-sm text-gray-600 whitespace-nowrap transition-colors ${
               open ? "bg-indigo-100" : ""
             }`}
           >
@@ -203,38 +191,13 @@ const TodaysSpecialsDropdown: React.FC<TodaysSpecialsDropdownProps> = ({ onChang
                 <div className="relative flex flex-col px-6 py-6 space-y-6">
                   {/* Select All Checkbox */}
                   <div className="flex items-center space-x-3 border-b pb-4">
-                    <button
-                      onClick={() => handleSelectAll(!allChecked)}
-                      className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                        allChecked
-                          ? "border-indigo-600 bg-indigo-600"
-                          : someChecked
-                          ? "border-indigo-600 bg-indigo-600/20"
-                          : "border-neutral-300 dark:border-neutral-600"
-                      }`}
-                    >
-                      {allChecked && (
-                        <svg
-                          className="w-3 h-3 text-white"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M5 13l4 4L19 7"
-                          />
-                        </svg>
-                      )}
-                      {someChecked && !allChecked && (
-                        <div className="w-2 h-2 bg-indigo-600 rounded-full" />
-                      )}
-                    </button>
-                    <span className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
-                      Select All Specials
-                    </span>
+                    <Checkbox
+                      name="select-all-specials"
+                      label="Select All Specials"
+                      labelClassName="text-sm font-medium text-neutral-900 dark:text-neutral-100"
+                      checked={allChecked}
+                      onChange={handleSelectAll}
+                    />
                   </div>
 
                   {/* Three Column Grid with Scrollbar */}
@@ -261,30 +224,12 @@ const TodaysSpecialsDropdown: React.FC<TodaysSpecialsDropdownProps> = ({ onChang
                               </p>
                             </div>
                           </div>
-                          <button
-                            onClick={() => handleSpecialToggle(special.name)}
-                            className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${
-                              special.checked
-                                ? "border-indigo-600 bg-indigo-600"
-                                : "border-neutral-300 dark:border-neutral-600 hover:border-indigo-400"
-                            }`}
-                          >
-                            {special.checked && (
-                              <svg
-                                className="w-3 h-3 text-white"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M5 13l4 4L19 7"
-                                />
-                              </svg>
-                            )}
-                          </button>
+                          <Checkbox
+                            name={special.name}
+                            className="ml-auto flex-shrink-0"
+                            checked={special.checked}
+                            onChange={(checked) => handleSpecialToggle(special.name, checked)}
+                          />
                         </div>
                       ))}
                     </div>

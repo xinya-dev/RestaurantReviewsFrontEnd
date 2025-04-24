@@ -26,6 +26,7 @@ import PopularFoodsDropdown from "@/components/PopularFoodsDropdown";
 import TodaysSpecialsDropdown from "@/components/TodaysSpecialsDropdown";
 import RestaurantTypeDropdown from '@/components/RestaurantTypeDropdown';
 import RestaurantNameDropdown from '@/components/RestaurantNameDropdown';
+import PredictiveSearchDropdown, { Suggestion } from '@/components/PredictiveSearchDropdown';
 
 export interface SectionHeroProps {
   className?: string;
@@ -77,6 +78,8 @@ const moreFilter3 = [
 
 const SectionHero: React.FC<SectionHeroProps> = ({ className = "" }) => {
   const [isOpenMoreFilter, setIsOpenMoreFilter] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   const closeModalMoreFilter = () => setIsOpenMoreFilter(false);
   const openModalMoreFilter = () => setIsOpenMoreFilter(true);
@@ -97,8 +100,8 @@ const SectionHero: React.FC<SectionHeroProps> = ({ className = "" }) => {
               key={item.name}
               name={item.name}
               label={item.name}
-              className="text-primary-500"
-              defaultChecked={!!item.defaultChecked}
+              className="bg-neutral-50 dark:bg-neutral-800"
+              checked={!!item.defaultChecked}
             />
           ))}
         </div>
@@ -108,8 +111,8 @@ const SectionHero: React.FC<SectionHeroProps> = ({ className = "" }) => {
               key={item.name}
               name={item.name}
               label={item.name}
-              className="text-primary-500"
-              defaultChecked={!!item.defaultChecked}
+              className="bg-neutral-50 dark:bg-neutral-800"
+              checked={!!item.defaultChecked}
             />
           ))}
         </div>
@@ -145,6 +148,18 @@ const SectionHero: React.FC<SectionHeroProps> = ({ className = "" }) => {
   const handleTodaysSpecialsChange = (selectedSpecials: string[]) => {
     console.log('Selected specials:', selectedSpecials);
     // Handle the selected specials
+  };
+
+  const handleSuggestionSelect = (suggestion: Suggestion) => {
+    console.log("Selected Suggestion:", suggestion);
+    if (suggestion.type === 'text') {
+      setSearchQuery(suggestion.text);
+    } else if (suggestion.type === 'restaurant') {
+      setSearchQuery(suggestion.name);
+    } else if (suggestion.type === 'dish') {
+      setSearchQuery(suggestion.name);
+    }
+    setIsSearchOpen(false);
   };
 
   return (
@@ -183,12 +198,26 @@ const SectionHero: React.FC<SectionHeroProps> = ({ className = "" }) => {
                     <PlusIcon className="w-6 h-6 text-indigo-600 stroke-2" />
                   </button>
                 </div>
-
-                <input
-                  type="text"
-                  placeholder="Ask anything"
-                  className="flex-1 px-4 py-4 text-lg border-none focus:ring-0 focus:outline-none"
-                />
+                
+                <div className="flex-1 relative">
+                  <input
+                    type="text"
+                    placeholder="Ask anything"
+                    className="w-full px-4 py-4 text-lg border-none focus:ring-0 focus:outline-none"
+                    value={searchQuery}
+                    onChange={(e) => {
+                      setSearchQuery(e.target.value);
+                      setIsSearchOpen(true);
+                    }}
+                    onFocus={() => setIsSearchOpen(true)}
+                  />
+                  <PredictiveSearchDropdown 
+                    query={searchQuery}
+                    isOpen={isSearchOpen && searchQuery.trim().length > 0}
+                    onClose={() => setIsSearchOpen(false)}
+                    onSelectSuggestion={handleSuggestionSelect}
+                  />
+                </div>
 
                 <div className="flex items-center gap-3 pr-4">
                   <LocationSelector onSelect={handleLocationSelect} />
