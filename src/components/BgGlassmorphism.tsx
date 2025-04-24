@@ -18,7 +18,7 @@ const BgGlassmorphism: FC<BgGlassmorphismProps> = ({
     > <Image src={image} alt="Restaurant ambiance" fill className="object-cover h-180 max-h-196 h-180" priority />
     
       <span className={`block bg-[#ef233c] w-72 h-50 rounded-full mix-blend-multiply filter blur-3xl opacity-10 lg:w-96 lg:h-80 ${spanClassName}`}></span>
-      {/* <span className="block bg-[#04868b] w-72 h-72 -ml-20 mt-40 rounded-full mix-blend-multiply filter blur-3xl opacity-10 lg:w-96 lg:h-96 nc-animation-delay-2000"></span> */}
+      {/* <span className="block bg-[#04868b] w-72 h-50 ml-20  rounded-full mix-blend-multiply filter blur-3xl opacity-10 lg:w-96 lg:h-96 nc-animation-delay-2000"></span> */}
     </div>
   );
 };
