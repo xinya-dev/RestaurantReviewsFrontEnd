@@ -97,7 +97,7 @@ const RRSearchForm: FC<RRSearchFormProps> = ({
                   taxonomy={{
                     id: tab.id,
                     name: tab.name,
-                    icon: <tab.icon className={`w-12 h-12 p-2 mr-1 bg-indigo-100 text-white rounded-full transition-all duration-700 ease-in-out ${
+                    icon: <tab.icon className={`w-12 h-12 p-2 mr-1 bg-indigo-100 text-indigo-600 rounded-full transition-all duration-700 ease-in-out ${
                       isSelected 
                         ? 'text-indigo-600' 
                         : 'text-indigo-600'
@@ -150,7 +150,7 @@ const RRSearchForm: FC<RRSearchFormProps> = ({
       className={`nc-RRSearchForm w-full max-w-6xl py-5 lg:py-0 ${className} flex flex-col justify-between items-center`}
       id="search-form"
     >
-      <div className="flex flex-[2] lg:flex-row flex-col items-center justify-center bg-white rounded-full w-[600px] h-[70px]">
+      {/* <div className="flex flex-[2] lg:flex-row flex-col items-center justify-center bg-white rounded-full w-[600px] h-[70px]">
       {renderInputLocation()}
       </div>
       <div className="flex flex-[2] lg:flex-row flex-col items-center justify-center">
@@ -158,7 +158,7 @@ const RRSearchForm: FC<RRSearchFormProps> = ({
               Or have a more precise search
 
               </span>
-      </div>
+      </div> */}
       {renderTab()}
       {renderForm()}
       

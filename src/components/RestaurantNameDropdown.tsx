@@ -1,0 +1,368 @@
+"use client";
+
+import React, { FC, useState, useRef, useEffect, Fragment } from "react";
+import { MagnifyingGlassIcon, ClockIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { Popover, Transition } from "@headlessui/react";
+
+interface Restaurant {
+  name: string;
+  cuisine: string;
+  rating?: number;
+  checked?: boolean;
+}
+
+interface RestaurantNameDropdownProps {
+  onChange?: (restaurants: Restaurant[]) => void;
+}
+
+const MAX_RECENT_SEARCHES = 5;
+
+// Sample restaurant data (in a real app, this would come from an API)
+const sampleRestaurants: Restaurant[] = [
+  { name: "The Italian Kitchen", cuisine: "Italian", rating: 4.5, checked: false },
+  { name: "Sushi Master", cuisine: "Japanese", rating: 4.8, checked: false },
+  { name: "Taj Mahal", cuisine: "Indian", rating: 4.3, checked: false },
+  { name: "Golden Dragon", cuisine: "Chinese", rating: 4.6, checked: false },
+  { name: "Le Petit Bistro", cuisine: "French", rating: 4.7, checked: false },
+  { name: "El Mariachi", cuisine: "Mexican", rating: 4.4, checked: false },
+  { name: "Thai Orchid", cuisine: "Thai", rating: 4.2, checked: false },
+  { name: "Greek Islands", cuisine: "Greek", rating: 4.5, checked: false },
+  { name: "Burger House", cuisine: "American", rating: 4.1, checked: false },
+  { name: "Pho Delicious", cuisine: "Vietnamese", rating: 4.4, checked: false }
+];
+
+const RestaurantNameDropdown: FC<RestaurantNameDropdownProps> = ({ onChange }) => {
+  const [showPopover, setShowPopover] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
+  const [selectedRestaurants, setSelectedRestaurants] = useState<Restaurant[]>([]);
+  const [filteredRestaurants, setFilteredRestaurants] = useState<Restaurant[]>([]);
+  const [recentSearches, setRecentSearches] = useState<Restaurant[]>([]);
+  const [isTooltipOpen, setIsTooltipOpen] = useState(false);
+  const tooltipTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Load recent searches from localStorage on mount
+  useEffect(() => {
+    const savedRecent = localStorage.getItem('recentRestaurantSearches');
+    if (savedRecent) {
+      setRecentSearches(JSON.parse(savedRecent));
+    }
+  }, []);
+
+  // Handle click outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        // setShowPopover(false); // Popover handles its own closing
+        // Let's not close tooltip on outside click, only on leave
+      }
+    };
+
+    //if (showPopover) { // Popover handles its own outside click
+    //  document.addEventListener('click', handleClickOutside);
+    //}
+
+    //return () => {
+    //  document.removeEventListener('click', handleClickOutside);
+    //};
+  }, [/* showPopover */]);
+
+  // Filter restaurants based on search
+  useEffect(() => {
+    if (searchValue.trim()) {
+      const searchTerm = searchValue.toLowerCase().trim();
+      const filtered = sampleRestaurants.map(restaurant => ({
+        ...restaurant,
+        checked: selectedRestaurants.some(r => r.name === restaurant.name)
+      })).filter(restaurant => 
+        restaurant.name.toLowerCase().includes(searchTerm) ||
+        restaurant.cuisine.toLowerCase().includes(searchTerm)
+      );
+      setFilteredRestaurants(filtered.slice(0, 10));
+    } else {
+      setFilteredRestaurants([]);
+    }
+  }, [searchValue, selectedRestaurants]);
+
+  const handleRestaurantToggle = (restaurant: Restaurant) => {
+    const isSelected = selectedRestaurants.some(r => r.name === restaurant.name);
+    let newSelected;
+
+    if (isSelected) {
+      newSelected = selectedRestaurants.filter(r => r.name !== restaurant.name);
+    } else {
+      newSelected = [...selectedRestaurants, { ...restaurant, checked: true }];
+    }
+
+    setSelectedRestaurants(newSelected);
+
+    // Update recent searches (only add if not already selected)
+    if (!isSelected) {
+       const newRecent = [restaurant, ...recentSearches.filter(item => 
+         item.name !== restaurant.name
+       )].slice(0, MAX_RECENT_SEARCHES);
+       setRecentSearches(newRecent);
+       localStorage.setItem('recentRestaurantSearches', JSON.stringify(newRecent));
+    }
+
+    if (onChange) {
+      onChange(newSelected);
+    }
+  };
+
+  // Function to handle deselecting from tooltip
+  const handleTooltipDeselect = (restaurantName: string, e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent closing the tooltip immediately
+    const restaurantToToggle = selectedRestaurants.find(r => r.name === restaurantName);
+    if (restaurantToToggle) {
+      handleRestaurantToggle(restaurantToToggle);
+    }
+  };
+
+  const handleMouseEnterButton = () => {
+    if (tooltipTimeoutRef.current) {
+      clearTimeout(tooltipTimeoutRef.current);
+    }
+    setIsTooltipOpen(true);
+  };
+
+  const handleMouseLeaveButton = () => {
+    tooltipTimeoutRef.current = setTimeout(() => {
+      setIsTooltipOpen(false);
+    }, 150); // Small delay to allow moving to tooltip
+  };
+
+  const handleMouseEnterTooltip = () => {
+    if (tooltipTimeoutRef.current) {
+      clearTimeout(tooltipTimeoutRef.current);
+    }
+  };
+
+  const handleMouseLeaveTooltip = () => {
+    tooltipTimeoutRef.current = setTimeout(() => {
+      setIsTooltipOpen(false);
+    }, 150);
+  };
+
+  const currentlySelected = selectedRestaurants; // Already have this state
+
+  return (
+    <Popover ref={containerRef} className="relative">
+      {({ open, close }) => (
+        <>
+          <Popover.Button
+            onMouseEnter={handleMouseEnterButton}
+            onMouseLeave={handleMouseLeaveButton}
+            className={`flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 rounded-full text-sm text-indigo-600 whitespace-nowrap transition-colors ${
+              open ? "bg-indigo-100" : ""
+            }`}
+          >
+            <MagnifyingGlassIcon className="w-5 h-5 stroke-2" />
+            <span className="font-medium">Restaurant Name</span>
+            <span className="text-xs text-indigo-500">
+              ({currentlySelected.length})
+            </span>
+          </Popover.Button>
+
+          {/* Selected Restaurants Tooltip */}
+          {isTooltipOpen && !open && currentlySelected.length > 0 && (
+             <div
+              onMouseEnter={handleMouseEnterTooltip}
+              onMouseLeave={handleMouseLeaveTooltip}
+              className="absolute z-[9999] w-64 bg-white dark:bg-neutral-800 mt-2 rounded-xl shadow-xl border dark:border-neutral-700"
+            >
+              <div className="px-3 pt-2 pb-1 text-xs font-semibold text-neutral-500 dark:text-neutral-400">Selected Restaurants</div>
+              <div className="max-h-32 overflow-y-auto scrollbar-thin scrollbar-thumb-neutral-300 dark:scrollbar-thumb-neutral-600 scrollbar-track-transparent px-3 pb-2">
+                {currentlySelected.map((restaurant) => (
+                  <div key={restaurant.name} className="flex items-center justify-between py-1 text-sm text-neutral-800 dark:text-neutral-200">
+                    <span className="truncate" title={restaurant.name}>{restaurant.name}</span>
+                    <button
+                      onClick={(e) => handleTooltipDeselect(restaurant.name, e)}
+                      className="p-0.5 rounded hover:bg-neutral-100 dark:hover:bg-neutral-700 text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-100 flex-shrink-0 ml-1"
+                      aria-label={`Deselect ${restaurant.name}`}
+                    >
+                      <XMarkIcon className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <Transition
+            as={Fragment}
+            show={open}
+            enter="transition ease-out duration-200"
+            enterFrom="opacity-0 translate-y-1"
+            enterTo="opacity-100 translate-y-0"
+            leave="transition ease-in duration-150"
+            leaveFrom="opacity-100 translate-y-0"
+            leaveTo="opacity-0 translate-y-1"
+          >
+             <Popover.Panel className="fixed z-[9999] w-screen max-w-4xl px-4 mt-3 left-1/2 -translate-x-1/2 top-[200px] sm:px-0">
+               <div className="overflow-hidden rounded-2xl shadow-xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700">
+                 <div className="relative flex flex-col px-6 py-6 space-y-6">
+                   {/* Search Input */}
+                   <div className="relative">
+                     <input
+                       type="text"
+                       placeholder="Search restaurants..."
+                       className="w-full pl-10 pr-3 py-2 border border-neutral-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                       value={searchValue}
+                       onChange={(e) => setSearchValue(e.target.value)}
+                     />
+                     <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400" />
+                   </div>
+    
+                   {/* Selected Restaurants Tags */}
+                   {selectedRestaurants.length > 0 && (
+                     <div className="border-b border-neutral-200 pb-4">
+                       <div className="text-xs font-semibold text-neutral-500 uppercase mb-2">Selected</div>
+                       <div className="flex flex-wrap gap-2">
+                         {selectedRestaurants.map((restaurant) => (
+                           <span key={restaurant.name} className="flex items-center bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-md text-xs">
+                             {restaurant.name}
+                             <XMarkIcon
+                               className="w-3 h-3 ml-1 cursor-pointer hover:text-indigo-900"
+                               onClick={(e) => {
+                                 e.stopPropagation();
+                                 handleRestaurantToggle(restaurant);
+                               }}
+                             />
+                           </span>
+                         ))}
+                       </div>
+                     </div>
+                   )}
+    
+                   <div className="overflow-y-auto max-h-[289px] scrollbar-thin scrollbar-thumb-neutral-300 dark:scrollbar-thumb-neutral-700 scrollbar-track-transparent pr-2">
+                     {/* Search Results */}
+                     {filteredRestaurants.length > 0 && (
+                       <div className="mb-4">
+                         <div className="text-xs font-semibold text-neutral-500 uppercase mb-2">Search Results</div>
+                         <div className="grid grid-cols-3 gap-x-6 gap-y-5">
+                           {filteredRestaurants.map((restaurant) => (
+                             <div
+                               key={restaurant.name}
+                               className="flex items-center justify-between p-2 hover:bg-neutral-50 dark:hover:bg-neutral-800 rounded-lg transition-colors cursor-pointer"
+                               onClick={() => handleRestaurantToggle(restaurant)}
+                             >
+                               <div>
+                                 <div className="text-sm font-medium text-neutral-900 dark:text-neutral-100">{restaurant.name}</div>
+                                 <div className="text-xs text-neutral-500">{restaurant.cuisine}</div>
+                                 {restaurant.rating && (
+                                   <div className="flex items-center gap-1 mt-1">
+                                     <span className="text-xs font-medium text-yellow-500">★</span>
+                                     <span className="text-xs text-neutral-600">{restaurant.rating}</span>
+                                   </div>
+                                 )}
+                               </div>
+                               <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors flex-shrink-0 ${
+                                 selectedRestaurants.some(r => r.name === restaurant.name)
+                                   ? "border-indigo-600 bg-indigo-600"
+                                   : "border-neutral-300 hover:border-indigo-400"
+                               }`}>
+                                 {selectedRestaurants.some(r => r.name === restaurant.name) && (
+                                   <svg
+                                     className="w-3 h-3 text-white"
+                                     fill="none"
+                                     viewBox="0 0 24 24"
+                                     stroke="currentColor"
+                                   >
+                                     <path
+                                       strokeLinecap="round"
+                                       strokeLinejoin="round"
+                                       strokeWidth={2}
+                                       d="M5 13l4 4L19 7"
+                                     />
+                                   </svg>
+                                 )}
+                               </div>
+                             </div>
+                           ))}
+                         </div>
+                       </div>
+                     )}
+    
+                     {/* Recent Searches */}
+                     {!searchValue && recentSearches.length > 0 && (
+                       <div>
+                         <div className="text-xs font-semibold text-neutral-500 uppercase mb-2">Recent Searches</div>
+                         <div className="grid grid-cols-3 gap-x-6 gap-y-5">
+                           {recentSearches.map((restaurant) => (
+                             <div
+                               key={`recent-${restaurant.name}`}
+                               className="flex items-center justify-between p-2 hover:bg-neutral-50 dark:hover:bg-neutral-800 rounded-lg transition-colors cursor-pointer"
+                               onClick={() => handleRestaurantToggle(restaurant)}
+                             >
+                               <div className="flex items-center gap-2">
+                                 <ClockIcon className="w-4 h-4 text-neutral-400" />
+                                 <div>
+                                   <div className="text-sm font-medium text-neutral-900 dark:text-neutral-100">{restaurant.name}</div>
+                                   <div className="text-xs text-neutral-500">{restaurant.cuisine}</div>
+                                 </div>
+                               </div>
+                               <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors flex-shrink-0 ${
+                                 selectedRestaurants.some(r => r.name === restaurant.name)
+                                   ? "border-indigo-600 bg-indigo-600"
+                                   : "border-neutral-300 hover:border-indigo-400"
+                               }`}>
+                                 {selectedRestaurants.some(r => r.name === restaurant.name) && (
+                                   <svg
+                                     className="w-3 h-3 text-white"
+                                     fill="none"
+                                     viewBox="0 0 24 24"
+                                     stroke="currentColor"
+                                   >
+                                     <path
+                                       strokeLinecap="round"
+                                       strokeLinejoin="round"
+                                       strokeWidth={2}
+                                       d="M5 13l4 4L19 7"
+                                     />
+                                   </svg>
+                                 )}
+                               </div>
+                             </div>
+                           ))}
+                         </div>
+                       </div>
+                     )}
+    
+                     {/* Messages */}
+                     {searchValue && filteredRestaurants.length === 0 && (
+                       <div className="text-neutral-500 text-center py-4">No restaurants found</div>
+                     )}
+                     {!searchValue && recentSearches.length === 0 && !selectedRestaurants.length && (
+                       <div className="text-neutral-500 text-center py-4">Type to search restaurants</div>
+                     )}
+                   </div>
+                 </div>
+    
+                 <div className="p-5 bg-neutral-50 dark:bg-neutral-900 dark:border-t dark:border-neutral-800 flex items-center justify-between">
+                   <button
+                     onClick={() => {
+                       setSelectedRestaurants([]);
+                       onChange?.([]);
+                     }}
+                     className="px-4 py-2 text-sm font-medium text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg transition-colors"
+                   >
+                     Clear
+                   </button>
+                   <button
+                     onClick={() => close()}
+                     className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors"
+                   >
+                     Apply
+                   </button>
+                 </div>
+               </div>
+             </Popover.Panel>
+          </Transition>
+        </>
+      )}
+    </Popover>
+  );
+};
+
+export default RestaurantNameDropdown; 
