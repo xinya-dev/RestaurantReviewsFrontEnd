@@ -247,7 +247,7 @@ const TabFilters = () => {
                     <Checkbox
                       name="All Airlines"
                       label="All Airlines"
-                      defaultChecked={airlinesStates.includes("All Airlines")}
+                      checked={airlinesStates.includes("All Airlines")}
                       onChange={(checked) =>
                         handleChangeAirlines(checked, "All Airlines")
                       }
@@ -258,7 +258,7 @@ const TabFilters = () => {
                         <Checkbox
                           name={item.name}
                           label={item.name}
-                          defaultChecked={airlinesStates.includes(item.name)}
+                          checked={airlinesStates.includes(item.name)}
                           onChange={(checked) =>
                             handleChangeAirlines(checked, item.name)
                           }
@@ -333,7 +333,7 @@ const TabFilters = () => {
                         <Checkbox
                           name={item.name}
                           label={item.name}
-                          defaultChecked={stopPontsStates.includes(item.name)}
+                          checked={stopPontsStates.includes(item.name)}
                           onChange={(checked) =>
                             handleChangeStopPoint(checked, item.name)
                           }
@@ -605,7 +605,7 @@ const TabFilters = () => {
     const list1 = data.filter((_, i) => i < data.length / 2);
     const list2 = data.filter((_, i) => i >= data.length / 2);
     return (
-      <div className="grid grid-cols-2 gap-8">
+      <div className="grid grid-cols-2 gap-y-7 gap-x-4 sm:gap-8">
         <div className="flex flex-col space-y-5">
           {list1.map((item) => (
             <Checkbox
@@ -613,7 +613,7 @@ const TabFilters = () => {
               name={item.name}
               subLabel={item.description}
               label={item.name}
-              defaultChecked={!!item.defaultChecked}
+              checked={!!item.defaultChecked}
             />
           ))}
         </div>
@@ -624,7 +624,7 @@ const TabFilters = () => {
               name={item.name}
               subLabel={item.description}
               label={item.name}
-              defaultChecked={!!item.defaultChecked}
+              checked={!!item.defaultChecked}
             />
           ))}
         </div>

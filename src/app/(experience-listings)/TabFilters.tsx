@@ -320,7 +320,7 @@ const TabFilters = () => {
     const list1 = data.filter((_, i) => i < data.length / 2);
     const list2 = data.filter((_, i) => i >= data.length / 2);
     return (
-      <div className="grid sm:grid-cols-2 gap-8">
+      <div className="grid grid-cols-2 gap-y-7 gap-x-4 sm:gap-8">
         <div className="flex flex-col space-y-5">
           {list1.map((item) => (
             <Checkbox
@@ -328,7 +328,7 @@ const TabFilters = () => {
               name={item.name}
               subLabel={item.description}
               label={item.name}
-              defaultChecked={!!item.defaultChecked}
+              checked={!!item.defaultChecked}
             />
           ))}
         </div>
@@ -339,7 +339,7 @@ const TabFilters = () => {
               name={item.name}
               subLabel={item.description}
               label={item.name}
-              defaultChecked={!!item.defaultChecked}
+              checked={!!item.defaultChecked}
             />
           ))}
         </div>
