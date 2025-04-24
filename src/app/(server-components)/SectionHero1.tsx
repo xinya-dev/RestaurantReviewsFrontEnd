@@ -202,7 +202,7 @@ const SectionHero: React.FC<SectionHeroProps> = ({ className = "" }) => {
                 <div className="flex-1 relative">
                   <input
                     type="text"
-                    placeholder="Ask anything"
+                    placeholder="Search for a restaurant, cuisine, deal, etc."
                     className="w-full px-4 py-4 text-lg border-none focus:ring-0 focus:outline-none"
                     value={searchQuery}
                     onChange={(e) => {
