@@ -319,7 +319,7 @@ const TabFilters = () => {
               name={item.name}
               subLabel={item.description}
               label={item.name}
-              defaultChecked={!!item.defaultChecked}
+              checked={!!item.defaultChecked}
             />
           ))}
         </div>
@@ -330,7 +330,7 @@ const TabFilters = () => {
               name={item.name}
               subLabel={item.description}
               label={item.name}
-              defaultChecked={!!item.defaultChecked}
+              checked={!!item.defaultChecked}
             />
           ))}
         </div>

@@ -201,7 +201,7 @@ const TodaysSpecialsDropdown: React.FC<TodaysSpecialsDropdownProps> = ({ onChang
                   </div>
 
                   {/* Three Column Grid with Scrollbar */}
-                  <div className="overflow-y-auto max-h-[289px] scrollbar-thin scrollbar-thumb-neutral-300 dark:scrollbar-thumb-neutral-700 scrollbar-track-transparent pr-2">
+                  <div className="overflow-y-auto max-h-[260px] scrollbar-thin scrollbar-thumb-neutral-300 dark:scrollbar-thumb-neutral-700 scrollbar-track-transparent pr-2">
                     <div className="grid grid-cols-3 gap-x-6 gap-y-5">
                       {selectedSpecials.map((special) => (
                         <div

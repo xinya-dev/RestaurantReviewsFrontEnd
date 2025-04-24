@@ -7,13 +7,13 @@ export interface BgGlassmorphismProps {
 }
 
 const BgGlassmorphism: FC<BgGlassmorphismProps> = ({
-  className = "absolute inset-x-0 md:top- xl:top- min-h- max-h-200 pl-20 py-24 flex overflow-hidden z-0 h-180 ",
-  image = "/images/banner4.jpg",
+  className = "absolute inset-x-0 md:top- xl:top- min-h- max-h-200  py-80 flex overflow-hidden z-0 h-100 ",
+  image = "/images/banner-white.jpeg",
   spanClassName = "hidden",
 }) => {
   return (
     <div
-      className={`nc-BgGlassmorphism ${className} h-180`}
+      className={`nc-BgGlassmorphism ${className} `}
       data-nc-id="BgGlassmorphism"
     > <Image src={image} alt="Restaurant ambiance" fill className="object-cover h-180 max-h-196 h-180" priority />
     

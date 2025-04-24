@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, Fragment } from "react";
+import React, { useState, Fragment, useRef, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -80,9 +80,27 @@ const SectionHero: React.FC<SectionHeroProps> = ({ className = "" }) => {
   const [isOpenMoreFilter, setIsOpenMoreFilter] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const searchContainerRef = useRef<HTMLDivElement>(null);
 
   const closeModalMoreFilter = () => setIsOpenMoreFilter(false);
   const openModalMoreFilter = () => setIsOpenMoreFilter(true);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(event.target as Node)) {
+        setIsSearchOpen(false);
+        setSearchQuery("");
+      }
+    };
+
+    if (isSearchOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isSearchOpen, searchQuery]);
 
   const renderMoreFilterItem = (
     data: {
@@ -152,18 +170,20 @@ const SectionHero: React.FC<SectionHeroProps> = ({ className = "" }) => {
 
   const handleSuggestionSelect = (suggestion: Suggestion) => {
     console.log("Selected Suggestion:", suggestion);
+    let newQuery = "";
     if (suggestion.type === 'text') {
-      setSearchQuery(suggestion.text);
+      newQuery = suggestion.text;
     } else if (suggestion.type === 'restaurant') {
-      setSearchQuery(suggestion.name);
+      newQuery = suggestion.name;
     } else if (suggestion.type === 'dish') {
-      setSearchQuery(suggestion.name);
+      newQuery = suggestion.name;
     }
+    setSearchQuery(newQuery);
     setIsSearchOpen(false);
   };
 
   return (
-    <div className={`nc-SectionHero relative pt-6 lg:pt-8 ${className}`}>
+    <div className={`nc-SectionHero relative pt-6 lg:pt-8 ${className} mb-[200px]`}>
       {/* Background Image */}
       {/* <div className="absolute inset-0 overflow-hidden">
         <Image
@@ -171,20 +191,19 @@ const SectionHero: React.FC<SectionHeroProps> = ({ className = "" }) => {
           alt="Restaurant ambiance"
           fill
           className="object-cover opacity-95"
-          priority
-        />
+          primb-[200px]
       </div> */}
 
       {/* Content */}
       <div className="relative z-10 container mx-auto">
         <div className="flex flex-col items-center justify-center">
-          <h1 className="text-4xl font-bold mb-12 text-center">What can I help with?</h1>
+          <h1 className="text-4xl font-bold mt-16  text-black">What can I help with?</h1>
           
           {/* ChatGPT-style Search Bar */}
           <div className="w-full max-w-8xl mx-auto">
             {/* Current Location Display */}
-            <div className="mb-4 flex justify-end">
-              <CurrentLocationDisplay className="bg-white px-4 py-2 rounded-full shadow-sm" />
+            <div className="mb-1 flex justify-center">
+              <CurrentLocationDisplay className=" px-4 py-2 rounded-lg  text-black " />
             </div>
 
             <div className="relative flex flex-col bg-white rounded-2xl shadow-lg">
@@ -199,24 +218,28 @@ const SectionHero: React.FC<SectionHeroProps> = ({ className = "" }) => {
                   </button>
                 </div>
                 
-                <div className="flex-1 relative">
+                <div className="flex-1 relative" ref={searchContainerRef}>
                   <input
                     type="text"
-                    placeholder="Search for a restaurant, cuisine, deal, etc."
+                    placeholder="Search restaurants by name, cuisines, types, etc."
                     className="w-full px-4 py-4 text-lg border-none focus:ring-0 focus:outline-none"
                     value={searchQuery}
                     onChange={(e) => {
                       setSearchQuery(e.target.value);
-                      setIsSearchOpen(true);
+                      setIsSearchOpen(e.target.value.trim().length > 0);
                     }}
-                    onFocus={() => setIsSearchOpen(true)}
+                    onFocus={() => {
+                      if(searchQuery.trim().length > 0) setIsSearchOpen(true);
+                    }}
                   />
-                  <PredictiveSearchDropdown 
-                    query={searchQuery}
-                    isOpen={isSearchOpen && searchQuery.trim().length > 0}
-                    onClose={() => setIsSearchOpen(false)}
-                    onSelectSuggestion={handleSuggestionSelect}
-                  />
+                  {isSearchOpen && (
+                    <PredictiveSearchDropdown 
+                      query={searchQuery}
+                      isOpen={isSearchOpen}
+                      onClose={() => setIsSearchOpen(false)}
+                      onSelectSuggestion={handleSuggestionSelect}
+                    />
+                  )}
                 </div>
 
                 <div className="flex items-center gap-3 pr-4">

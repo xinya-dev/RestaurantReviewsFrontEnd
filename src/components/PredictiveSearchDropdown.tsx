@@ -210,7 +210,7 @@ const PredictiveSearchDropdown: FC<PredictiveSearchDropdownProps> = ({
   const richSuggestions = suggestions.filter(s => s.type === 'restaurant' || s.type === 'dish');
 
   return (
-    <div className="absolute z-50 top-full left-0 right-0 mt-1 w-full shadow-lg rounded-b-2xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 overflow-hidden max-h-[60vh] flex flex-col">
+    <div className="absolute z-50 top-full left-0 right-0 mt-1 w-full shadow-lg rounded-b-2xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 overflow-hidden max-h-[48vh] flex flex-col">
        {loading && <div className="p-4 text-center text-sm text-neutral-500">Loading...</div>}
        {!loading && query.trim() && suggestions.length === 0 && (
         <div className="p-4 text-center text-sm text-neutral-500">No results found for "{query}"</div>

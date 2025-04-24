@@ -227,7 +227,7 @@ const RestaurantNameDropdown: FC<RestaurantNameDropdownProps> = ({ onChange }) =
                      </div>
                    )}
     
-                   <div className="overflow-y-auto max-h-[289px] scrollbar-thin scrollbar-thumb-neutral-300 dark:scrollbar-thumb-neutral-700 scrollbar-track-transparent pr-2">
+                   <div className="overflow-y-auto max-h-[234px] scrollbar-thin scrollbar-thumb-neutral-300 dark:scrollbar-thumb-neutral-700 scrollbar-track-transparent pr-2">
                      {/* Search Results */}
                      {filteredRestaurants.length > 0 && (
                        <div className="mb-4">
