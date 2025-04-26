@@ -263,7 +263,7 @@ const LocationSelector: FC<LocationSelectorProps> = ({ onSelect }) => {
         onClick={() => setShowPopover(!showPopover)}
         onMouseEnter={() => selectedLocations.length > 1 && setShowTooltip(true)}
         onMouseLeave={() => setShowTooltip(false)}
-        className="flex items-center gap-1.5 px-3 py-1.5 border-2 border-indigo-200 hover:border-indigo-300 rounded-lg text-sm text-neutral-600 whitespace-nowrap transition-all hover:bg-gray-50 min-w-[200px]"
+        className="flex items-center gap-1.5 px-1 py-1.5 border-2 border-indigo-200 hover:border-indigo-300 rounded-lg text-sm text-neutral-600 whitespace-nowrap transition-all hover:bg-gray-50 min-w-[200px]"
       >
         <MapPinIcon className="w-5 h-5 stroke-2 text-neutral-500 flex-shrink-0" />
         <div className="flex items-center gap-1 flex-1 min-w-0">

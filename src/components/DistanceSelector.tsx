@@ -112,7 +112,7 @@ const DistanceSelector: FC<DistanceSelectorProps> = ({
               onMouseEnter={() => setIsTooltipVisible(true)}
               onMouseLeave={() => setIsTooltipVisible(false)}
               onClick={() => setIsTooltipVisible(false)}
-              className="flex items-center gap-1 px-3 py-1.5 border-2 border-indigo-200 hover:border-indigo-300 rounded-lg text-sm text-neutral-600 whitespace-nowrap transition-all hover:bg-gray-50 min-w-[170px] max-h-[35px]"
+              className="flex items-center justify-start gap-1 px-1 py-1.5 border-2 border-indigo-200 hover:border-indigo-300 rounded-lg text-sm text-neutral-600 whitespace-nowrap transition-all hover:bg-gray-50 min-w-[120px] max-h-[35px]"
             >
               {/* Tooltip */}
               <div
@@ -129,7 +129,7 @@ const DistanceSelector: FC<DistanceSelectorProps> = ({
               <div className="text-neutral-300 dark:text-neutral-400">
                 <MapIcon className="w-4 h-4 lg:w-6 lg:h-6" />
               </div>
-              <div className="flex-grow text-sm min-w-[120px]">
+              <div className="flex-grow text-sm ">
                 <span className="block xl:text-sm font-semibold truncate ">
                   {`${formatDistance(rangeDistance[0])} - ${formatDistance(rangeDistance[1])} km`}
                 </span>
@@ -159,8 +159,8 @@ const DistanceSelector: FC<DistanceSelectorProps> = ({
                   ? 'bottom-[calc(100%+1.5rem)]' 
                   : 'top-[calc(100%+1.5rem)]'}
                 ${dropdownPosition.horizontal === 'left'
-                  ? 'left-0'
-                  : 'right-0'}
+                  ? 'left-[-100px]'
+                  : 'right-[-100px]'}
                 py-5 sm:py-6 px-4 sm:px-8 rounded-3xl shadow-xl h-[240px]`}
             >
               <div className="relative flex flex-col space-y-8">

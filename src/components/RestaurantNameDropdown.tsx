@@ -145,11 +145,11 @@ const RestaurantNameDropdown: FC<RestaurantNameDropdownProps> = ({ onChange }) =
           <Popover.Button
             onMouseEnter={handleMouseEnterButton}
             onMouseLeave={handleMouseLeaveButton}
-            className={`flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 hover:bg-indigo-100 rounded-lg text-sm text-gray-600 whitespace-nowrap transition-colors ${
+            className={`flex items-center gap-1.5 px-1 py-1.5 bg-gray-100 hover:bg-indigo-100 rounded-lg text-sm text-gray-600 whitespace-nowrap transition-colors ${
               open ? "bg-indigo-100" : ""
             }`}
           >
-            <MagnifyingGlassIcon className="w-5 h-5 stroke-2" />
+            <MagnifyingGlassIcon className="w-8 h-8 stroke-2 text-green-600" />
             <span className="font-medium">Restaurant Name</span>
             <span className="text-xs text-indigo-500">
               ({currentlySelected.length})
@@ -163,7 +163,10 @@ const RestaurantNameDropdown: FC<RestaurantNameDropdownProps> = ({ onChange }) =
               onMouseLeave={handleMouseLeaveTooltip}
               className="absolute z-[9999] w-64 bg-white dark:bg-neutral-800 mt-2 rounded-xl shadow-xl border dark:border-neutral-700"
             >
-              <div className="px-3 pt-2 pb-1 text-xs font-semibold text-neutral-500 dark:text-neutral-400">Selected Restaurants</div>
+              <div className="px-3 pt-2 pb-1 text-xs font-semibold text-neutral-500 dark:text-neutral-400">Search by Name</div>
+              <div className="px-3 pb-2 text-sm text-neutral-600 dark:text-neutral-300">
+                Looking for a specific restaurant? Search by name to find your favorite dining spots quickly.
+              </div>
               <div className="max-h-32 overflow-y-auto scrollbar-thin scrollbar-thumb-neutral-300 dark:scrollbar-thumb-neutral-600 scrollbar-track-transparent px-3 pb-2">
                 {currentlySelected.map((restaurant) => (
                   <div key={restaurant.name} className="flex items-center justify-between py-1 text-sm text-neutral-800 dark:text-neutral-200">

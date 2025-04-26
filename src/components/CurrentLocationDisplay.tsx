@@ -99,8 +99,8 @@ const CurrentLocationDisplay: React.FC<CurrentLocationDisplayProps> = ({ classNa
 
   return (
     <div className={`flex items-center gap-2 text-sm text-neutral-600 ${className}`}>
-      <MapPinIcon className="w-8 h-8 text-red-600 bg-white rounded-full p-1" />
-      <span className="truncate text-black">
+      <MapPinIcon className="w-7 h-7  text-indigo-600 font-bold bg-white rounded-full " />
+      <span className="truncate text-gray-600">
         {location.city ? 
           `${location.city}${location.state ? `, ${location.state}` : ''}${location.postcode ? ` ${location.postcode}` : ''}${location.country ? `, ${location.country}` : ''}` 
           : 

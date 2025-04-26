@@ -288,12 +288,12 @@ const InternationalCuisinesDropdown: React.FC<InternationalCuisinesDropdownProps
           <Popover.Button
             onMouseEnter={handleMouseEnterButton}
             onMouseLeave={handleMouseLeaveButton}
-            className={`flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 hover:bg-indigo-100 rounded-lg text-sm text-gray-600 whitespace-nowrap transition-colors ${
+            className={`flex items-center gap-1.5 px-1 py-1.5 bg-gray-100 hover:bg-indigo-100 rounded-lg text-sm text-gray-600 whitespace-nowrap transition-colors ${
               open ? "bg-gray-100" : ""
             }`}
           >
-            <GlobeAltIcon className="w-5 h-5 stroke-2" />
-            <span className="font-medium">International Cuisines</span>
+            <GlobeAltIcon className="w-8 h-8 stroke-2 text-green-600" />
+            <span className="font-medium ">International Cuisines</span>
             <span className="text-xs text-indigo-500">
               ({currentlySelected.length})
             </span>
@@ -306,7 +306,10 @@ const InternationalCuisinesDropdown: React.FC<InternationalCuisinesDropdownProps
               onMouseLeave={handleMouseLeaveTooltip}
               className="absolute z-[9999] w-64 bg-white dark:bg-neutral-800 mt-2 rounded-xl shadow-xl border dark:border-neutral-700"
             >
-              <div className="px-3 pt-2 pb-1 text-xs font-semibold text-neutral-500 dark:text-neutral-400">Selected Cuisines</div>
+              <div className="px-3 pt-2 pb-1 text-xs font-semibold text-neutral-500 dark:text-neutral-400">Filter by Cuisine</div>
+              <div className="px-3 pb-2 text-sm text-neutral-600 dark:text-neutral-300">
+                Discover restaurants by their cuisine type. Select from Italian, Chinese, Indian, and more to find your perfect dining experience.
+              </div>
               <div className="max-h-32 overflow-y-auto scrollbar-thin scrollbar-thumb-neutral-300 dark:scrollbar-thumb-neutral-600 scrollbar-track-transparent px-3 pb-2">
                 {currentlySelected.map((cuisine) => (
                   <div key={cuisine.name} className="flex items-center justify-between py-1 text-sm text-neutral-800 dark:text-neutral-200">

@@ -183,24 +183,17 @@ const SectionHero: React.FC<SectionHeroProps> = ({ className = "" }) => {
   };
 
   return (
-    <div className={`nc-SectionHero relative pt-6 lg:pt-8 ${className} mb-[200px]`}>
+    <div className={`nc-SectionHero relative pt-6 lg:pt-8 ${className} mb-[100px] mt-[50px] `}>
       {/* Background Image */}
-      {/* <div className="absolute inset-0 overflow-hidden">
-        <Image
-          src="/images/restaurant7.png"
-          alt="Restaurant ambiance"
-          fill
-          className="object-cover opacity-95"
-          primb-[200px]
-      </div> */}
+     
 
       {/* Content */}
       <div className="relative z-10 container mx-auto">
         <div className="flex flex-col items-center justify-center">
-          <h1 className="text-4xl font-bold mt-16  text-black">What can I help with?</h1>
+          <h1 className="text-4xl mt-20  text-gray-600 font-semibold">What can I help with?</h1>
           
           {/* ChatGPT-style Search Bar */}
-          <div className="w-full max-w-8xl mx-auto">
+          <div className="w-full max-w-5xl  mx-auto">
             {/* Current Location Display */}
             <div className="mb-1 flex justify-center">
               <CurrentLocationDisplay className=" px-4 py-2 rounded-lg  text-black " />
@@ -208,8 +201,8 @@ const SectionHero: React.FC<SectionHeroProps> = ({ className = "" }) => {
 
             <div className="relative flex flex-col bg-white rounded-2xl shadow-lg">
               {/* Input and Icons Row */}
-              <div className="flex items-center border-b border-neutral-200">
-                <div className="flex items-center gap-2 pl-4">
+              <div className="flex items-center h-[100px]">
+                <div className="flex items-center gap-3 pl-4">
                   <button 
                     onClick={openModalMoreFilter}
                     className="p-2 hover:bg-indigo-50 rounded-lg transition-colors"
@@ -222,9 +215,10 @@ const SectionHero: React.FC<SectionHeroProps> = ({ className = "" }) => {
                   <input
                     type="text"
                     placeholder="Search restaurants by name, cuisines, types, etc."
+                    
                     className="w-full px-4 py-4 text-lg border-none focus:ring-0 focus:outline-none"
                     value={searchQuery}
-                    onChange={(e) => {
+                    onChange={(e) => {      
                       setSearchQuery(e.target.value);
                       setIsSearchOpen(e.target.value.trim().length > 0);
                     }}
@@ -242,35 +236,114 @@ const SectionHero: React.FC<SectionHeroProps> = ({ className = "" }) => {
                   )}
                 </div>
 
-                <div className="flex items-center gap-3 pr-4">
+                <div className="flex items-center gap-1 pr-4">
                   <LocationSelector onSelect={handleLocationSelect} />
                   <DistanceSelector 
                     onChange={handleDistanceChange}
                     defaultDistance="1-10"
                   />
-                  <button className="p-2 hover:bg-indigo-50 rounded-lg transition-colors">
+                  <button className="p-1 hover:bg-indigo-50 rounded-lg transition-colors">
                     <MicrophoneIcon className="w-6 h-6 text-indigo-600 stroke-2" />
                   </button>
+                  
+                </div>
+                <div className="flex items-center gap-3 pr-4">
                   <button className="p-2 bg-indigo-600 hover:bg-indigo-700 rounded-full transition-colors">
                     <MagnifyingGlassIcon className="w-6 h-6 text-white stroke-2" />
                   </button>
                 </div>
               </div>
 
-              {/* Filter Tags Row */}
-              <div className="flex items-center justify-between px-3 py-2">
-                <InternationalCuisinesDropdown onChange={handleCuisineChange} />
-                <FavouriteDishDropdown onChange={handleFavouriteDishChange} />
-                <PopularFoodsDropdown onChange={handlePopularFoodsChange} />
-                <RestaurantNameDropdown onChange={(restaurants) => {
-                  console.log('Selected restaurants:', restaurants);
-                  // Handle restaurant selection
-                }} />
-                <TodaysSpecialsDropdown onChange={handleTodaysSpecialsChange} />
-                <RestaurantTypeDropdown onChange={(selectedTypes) => {
-                  console.log('Selected types:', selectedTypes);
-                  // Handle selected types
-                }} />
+             
+            </div>
+          </div>
+           {/* Filter Tags Row */}
+           <div className="flex  items-center justify-between mt-4 gap-4">
+            <div className = " group relative">
+              <div className="">
+                <InternationalCuisinesDropdown 
+                  onChange={handleCuisineChange} 
+                />
+              </div>
+              <div className="absolute z-10 hidden group-hover:block w-64 bg-white dark:bg-neutral-800 mt-2 rounded-xl shadow-xl border dark:border-neutral-700">
+                <div className="px-3 pt-2 pb-1 text-xs font-semibold text-neutral-500 dark:text-neutral-400">Filter by Cuisine</div>
+                <div className="px-3 pb-2 text-sm text-neutral-600 dark:text-neutral-300">
+                  Discover restaurants by their cuisine type. Select from Italian, Chinese, Indian, and more to find your perfect dining experience.
+                </div>
+              </div>
+            </div>
+
+            <div className="group relative">
+              <div className="">
+                <FavouriteDishDropdown 
+                  onChange={handleFavouriteDishChange} 
+                />
+              </div>
+              <div className="absolute z-10 hidden group-hover:block w-64 bg-white dark:bg-neutral-800 mt-2 rounded-xl shadow-xl border dark:border-neutral-700">
+                <div className="px-3 pt-2 pb-1 text-xs font-semibold text-neutral-500 dark:text-neutral-400">Find Your Favorites</div>
+                <div className="px-3 pb-2 text-sm text-neutral-600 dark:text-neutral-300">
+                  Search for specific dishes you love. Whether it's pizza, sushi, or curry, find restaurants that serve your favorite meals.
+                </div>
+              </div>
+            </div>
+
+            <div className="group relative">
+              <div className="">
+                <PopularFoodsDropdown 
+                  onChange={handlePopularFoodsChange} 
+                />
+              </div>
+              <div className="absolute z-10 hidden group-hover:block w-64 bg-white dark:bg-neutral-800 mt-2 rounded-xl shadow-xl border dark:border-neutral-700">
+                <div className="px-3 pt-2 pb-1 text-xs font-semibold text-neutral-500 dark:text-neutral-400">Trending Dishes</div>
+                <div className="px-3 pb-2 text-sm text-neutral-600 dark:text-neutral-300">
+                  Explore what's popular right now. Find restaurants serving trending dishes and discover new favorites.
+                </div>
+              </div>
+            </div>
+
+            <div className="group relative">
+                <div className="">
+                <RestaurantNameDropdown 
+                  onChange={(restaurants) => {
+                    console.log('Selected restaurants:', restaurants);
+                  }}
+                />
+              </div>
+              <div className="absolute z-10 hidden group-hover:block w-64 bg-white dark:bg-neutral-800 mt-2 rounded-xl shadow-xl border dark:border-neutral-700">
+                <div className="px-3 pt-2 pb-1 text-xs font-semibold text-neutral-500 dark:text-neutral-400">Search by Name</div>
+                <div className="px-3 pb-2 text-sm text-neutral-600 dark:text-neutral-300">
+                  Looking for a specific restaurant? Search by name to find your favorite dining spots quickly.
+                </div>
+              </div>
+            </div>
+
+            <div className="group relative">
+              <div className="">
+                <TodaysSpecialsDropdown 
+                  onChange={handleTodaysSpecialsChange} 
+                />
+              </div>
+              <div className="absolute z-10 hidden group-hover:block w-64 bg-white dark:bg-neutral-800 mt-2 rounded-xl shadow-xl border dark:border-neutral-700">
+                <div className="px-3 pt-2 pb-1 text-xs font-semibold text-neutral-500 dark:text-neutral-400">Today's Specials</div>
+                <div className="px-3 pb-2 text-sm text-neutral-600 dark:text-neutral-300">
+                  Find restaurants offering special deals and promotions today. Save money while enjoying great food!
+                </div>
+            </div>
+          </div>
+
+            <div className="group relative">
+              <div className="">
+                <RestaurantTypeDropdown 
+                  onChange={(selectedTypes) => {
+                    console.log('Selected types:', selectedTypes);
+                  }}
+                />
+              </div>
+              <div className="absolute z-10 hidden group-hover:block w-64 bg-white dark:bg-neutral-800 mt-2 rounded-xl shadow-xl border dark:border-neutral-700">
+                <div className="px-3 pt-2 pb-1 text-xs font-semibold text-neutral-500 dark:text-neutral-400">Restaurant Types</div>
+                <div className="px-3 pb-2 text-sm text-neutral-600 dark:text-neutral-300">
+                  Filter by restaurant style - from fine dining to casual eateries, find the perfect atmosphere for your meal.
+                </div>
               </div>
             </div>
           </div>

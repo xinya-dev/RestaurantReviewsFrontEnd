@@ -171,7 +171,7 @@ const RestaurantTypeDropdown: React.FC<RestaurantTypeDropdownProps> = ({ onChang
               open ? "bg-gray-100" : ""
             }`}
           >
-            <BuildingStorefrontIcon className="w-5 h-5 stroke-2" />
+            <BuildingStorefrontIcon className="w-8 h-8 stroke-2 text-green-600" />
             <span className="font-medium">Restaurant Type</span>
             <span className="text-xs text-indigo-500">
               ({currentlySelected.length})
@@ -185,7 +185,10 @@ const RestaurantTypeDropdown: React.FC<RestaurantTypeDropdownProps> = ({ onChang
               onMouseLeave={handleMouseLeaveTooltip}
               className="absolute z-[9999] w-64 bg-white dark:bg-neutral-800 mt-2 rounded-xl shadow-xl border dark:border-neutral-700"
             >
-              <div className="px-3 pt-2 pb-1 text-xs font-semibold text-neutral-500 dark:text-neutral-400">Selected Types</div>
+              <div className="px-3 pt-2 pb-1 text-xs font-semibold text-neutral-500 dark:text-neutral-400">Restaurant Types</div>
+              <div className="px-3 pb-2 text-sm text-neutral-600 dark:text-neutral-300">
+                Filter by restaurant style - from fine dining to casual eateries, find the perfect atmosphere for your meal.
+              </div>
               <div className="max-h-32 overflow-y-auto scrollbar-thin scrollbar-thumb-neutral-300 dark:scrollbar-thumb-neutral-600 scrollbar-track-transparent px-3 pb-2">
                 {currentlySelected.map((type) => (
                   <div key={type.name} className="flex items-center justify-between py-1 text-sm text-neutral-800 dark:text-neutral-200">
